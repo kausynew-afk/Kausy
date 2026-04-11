@@ -1,10 +1,10 @@
 # Job Application Tracker Report
 
-**Total jobs processed:** 149  
-**Emailed / Processed:** 13  
-**Skipped:** 136  
+**Total jobs processed:** 170  
+**Emailed / Processed:** 21  
+**Skipped:** 149  
 **Errors:** 0  
-**Last updated:** 2026-04-11 13:10:43
+**Last updated:** 2026-04-11 13:29:34
 
 ---
 
@@ -25,6 +25,14 @@
 | 11 | LI-4387766579 | Bajaj Finserv | Software Engineer | linkedin | 76.4% | 2026-04-11 11:53 | LI-4387766579_BajajFinserv_SoftwareEngineer_2026-04-11.md | [Link](https://in.linkedin.com/jobs/view/software-engineer-at-bajaj-finserv-4387766579) |
 | 12 | LI-4394788543 | Neev | BIM Engineer- Mechanical & Plumbing IV | linkedin | 93.3% | 2026-04-11 11:53 | LI-4394788543_Neev_BIMEngineerMechanicalPlumbingIV_2026-04-11.md | [Link](https://in.linkedin.com/jobs/view/bim-engineer-mechanical-plumbing-iv-at-neev-4394788543) |
 | 13 | LI-4395972145 | Globex Digital | Platform Validation Engineer | linkedin | 71.7% | 2026-04-11 11:53 | LI-4395972145_GlobexDigital_PlatformValidationEngineer_2026-04-11.md | [Link](https://in.linkedin.com/jobs/view/platform-validation-engineer-at-globex-digital-4395972145) |
+| 14 | LI-4393561606 | Tata Consultancy Services | Test Engineer | linkedin | 100.0% | 2026-04-11 13:29 | LI-4393561606_TataConsultancyServices_TestEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/test-engineer-at-tata-consultancy-services-4393561606) |
+| 15 | LI-4079934536 | Williams-Sonoma, Inc. | Automation Engineer | linkedin | 75.5% | 2026-04-11 13:29 | LI-4079934536_WilliamsSonomaInc_AutomationEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/automation-engineer-at-williams-sonoma-inc-4079934536) |
+| 16 | LI-4396756712 | Barclays | Test Engineer | linkedin | 75.6% | 2026-04-11 13:29 | LI-4396756712_Barclays_TestEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/test-engineer-at-barclays-4396756712) |
+| 17 | LI-4384036787 | EPAM Systems | Software Engineer – Salesforce Testing | linkedin | 73.5% | 2026-04-11 13:29 | LI-4384036787_EPAMSystems_SoftwareEngineerSalesforceTesting_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/software-engineer-%E2%80%93-salesforce-testing-at-epam-systems-4384036787) |
+| 18 | LI-4398851818 | Barclays | Automation Test Engineer - BA4 | linkedin | 77.6% | 2026-04-11 13:29 | LI-4398851818_Barclays_AutomationTestEngineerBA4_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/automation-test-engineer-ba4-at-barclays-4398851818) |
+| 19 | LI-4371178073 | eInfochips (An Arrow Company) | DFT Engineer | linkedin | 72.5% | 2026-04-11 13:29 | LI-4371178073_eInfochipsAnArrowCompany_DFTEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/dft-engineer-at-einfochips-an-arrow-company-4371178073) |
+| 20 | LI-4387766579 | Bajaj Finserv | Software Engineer | linkedin | 76.4% | 2026-04-11 13:29 | LI-4387766579_BajajFinserv_SoftwareEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/software-engineer-at-bajaj-finserv-4387766579) |
+| 21 | LI-4394788543 | Neev | BIM Engineer- Mechanical & Plumbing IV | linkedin | 93.3% | 2026-04-11 13:29 | LI-4394788543_Neev_BIMEngineerMechanicalPlumbingIV_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/bim-engineer-mechanical-plumbing-iv-at-neev-4394788543) |
 
 ## Skipped Jobs
 
@@ -166,6 +174,19 @@
 | 134 | LI-4383726398 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
 | 135 | LI-4383714912 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
 | 136 | LI-4395972145 | Globex Digital | Platform Validation Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate UID (same platform+company+title+url)) |
+| 137 | LI-4397835671 | StarApps Studio | QA Engineer | linkedin | 68.2% | ATS score 68.2% below target 70% after 3 iterations |
+| 138 | LI-4386856290 | Siemens Energy | Quality Assurance Engineer | linkedin | 48.8% | ATS score 48.8% below target 70% after 3 iterations |
+| 139 | LI-4397770375 | OUTSCALE | Operational QA Engineer | linkedin | 55.8% | ATS score 55.8% below target 70% after 3 iterations |
+| 140 | LI-4386324059 | Tarana Wireless | Cloud QA Automation Engineer (Python) | linkedin | 56.5% | ATS score 56.5% below target 70% after 3 iterations |
+| 141 | LI-4398232186 | EPAM Systems | UI Path Developer | linkedin | 63.7% | ATS score 63.7% below target 70% after 3 iterations |
+| 142 | LI-4397162305 | Barclays | Software Development Engineer in Test | linkedin | 44.3% | ATS score 44.3% below target 70% after 3 iterations |
+| 143 | LI-4400367992 | Geta AI Labs Private Limited | Software Engineer | linkedin | 62.5% | ATS score 62.5% below target 70% after 3 iterations |
+| 144 | LI-4382566681 | EPAM Systems | Data Quality Engineer | linkedin | 54.7% | ATS score 54.7% below target 70% after 3 iterations |
+| 145 | LI-4383478991 | SAS | Sr Associate SDET | linkedin | 59.4% | ATS score 59.4% below target 70% after 3 iterations |
+| 146 | LI-4383544448 | Siemens Energy | Supplier Quality Engineer | linkedin | 51.6% | ATS score 51.6% below target 70% after 3 iterations |
+| 147 | LI-4383545446 | Siemens Energy | Supplier Quality Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
+| 148 | LI-4387973920 | Siemens Energy | Supplier Quality Engineer, Piping | linkedin | 62.4% | ATS score 62.4% below target 70% after 3 iterations |
+| 149 | LI-4398867008 | Barclays | Salesforce Test Engineer | linkedin | 66.4% | ATS score 66.4% below target 70% after 3 iterations |
 
 ---
 
@@ -175,18 +196,18 @@ Most commonly requested skills you're missing:
 
 | Skill | Times Requested |
 |-------|----------------|
-| go | 20 |
-| excel | 15 |
-| azure | 11 |
-| python | 10 |
-| devops | 10 |
-| aws | 9 |
-| security | 7 |
-| gcp | 6 |
-| cypress | 5 |
-| github actions | 5 |
-| scrum | 4 |
-| cucumber | 4 |
-| salesforce | 4 |
-| design patterns | 4 |
-| oop | 4 |
+| go | 33 |
+| excel | 26 |
+| azure | 18 |
+| python | 17 |
+| aws | 16 |
+| devops | 16 |
+| gcp | 11 |
+| security | 11 |
+| cypress | 8 |
+| github actions | 8 |
+| docker | 8 |
+| scrum | 7 |
+| cucumber | 6 |
+| salesforce | 6 |
+| design patterns | 6 |
