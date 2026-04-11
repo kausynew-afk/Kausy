@@ -63,7 +63,13 @@ class BaseScraper(ABC):
         """Launch browser, scrape listings, return results."""
         listings: list[JobListing] = []
         async with async_playwright() as pw:
-            browser = await pw.chromium.launch(headless=True)
+            browser = await pw.chromium.launch(
+                headless=True,
+                args=[
+                    "--ignore-certificate-errors",
+                    "--disable-blink-features=AutomationControlled",
+                ],
+            )
             context = await self._create_context(browser)
             page = await context.new_page()
 
