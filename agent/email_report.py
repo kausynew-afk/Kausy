@@ -1,4 +1,4 @@
-"""Email report sender — sends run summary + tailored resumes to user's inbox."""
+"""Email report — generates HTML report file + sends via SMTP or saves for workflow."""
 
 from __future__ import annotations
 
@@ -18,14 +18,16 @@ logger = logging.getLogger(__name__)
 
 
 class EmailReporter:
-    """Sends a styled HTML email with the run report and attached resumes."""
+    """Generates a styled HTML report and optionally sends via SMTP."""
 
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
         auto = config.get("automation", {})
         self._recipient = auto.get("email_recipient", "")
-        self._smtp_user = os.environ.get("GMAIL_USER", "")
-        self._smtp_pass = os.environ.get("GMAIL_APP_PASSWORD", "")
+        self._smtp_user = os.environ.get("SMTP_USER", os.environ.get("GMAIL_USER", ""))
+        self._smtp_pass = os.environ.get("SMTP_PASSWORD", os.environ.get("GMAIL_APP_PASSWORD", ""))
+        self._smtp_server = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+        self._smtp_port = int(os.environ.get("SMTP_PORT", "587"))
         self._output_dir = Path(config.get("logging", {}).get("output_directory", "output"))
 
     def send_report(
@@ -34,28 +36,35 @@ class EmailReporter:
         run_id: str,
         stats: dict[str, Any],
     ) -> bool:
+        html = self._render_html(records, run_id, stats)
+
+        report_path = self._output_dir / "email_report.html"
+        report_path.write_text(html, encoding="utf-8")
+        logger.info("Email HTML report saved to %s", report_path)
+
         if not self._recipient:
-            logger.info("Email: no recipient configured, skipping")
+            logger.info("Email: no recipient configured, skipping send")
             return False
         if not self._smtp_user or not self._smtp_pass:
-            logger.warning(
-                "Email: GMAIL_USER or GMAIL_APP_PASSWORD env vars not set, skipping"
+            logger.info(
+                "Email: SMTP credentials not set (set SMTP_USER + SMTP_PASSWORD "
+                "or GMAIL_USER + GMAIL_APP_PASSWORD). Report saved to %s", report_path,
             )
             return False
 
         try:
-            msg = self._build_email(records, run_id, stats)
+            msg = self._build_email(records, run_id, stats, html)
             self._attach_resumes(msg, records)
 
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            with smtplib.SMTP(self._smtp_server, self._smtp_port) as server:
                 server.starttls()
                 server.login(self._smtp_user, self._smtp_pass)
                 server.send_message(msg)
 
-            logger.info("Email report sent to %s", self._recipient)
+            logger.info("Email report sent to %s via %s", self._recipient, self._smtp_server)
             return True
         except Exception as e:
-            logger.error("Email send failed: %s", e)
+            logger.error("Email send failed: %s. Report still saved to %s", e, report_path)
             return False
 
     def _build_email(
@@ -63,6 +72,7 @@ class EmailReporter:
         records: list[ApplicationRecord],
         run_id: str,
         stats: dict[str, Any],
+        html: str,
     ) -> MIMEMultipart:
         msg = MIMEMultipart("mixed")
         msg["From"] = self._smtp_user
@@ -72,8 +82,6 @@ class EmailReporter:
             f"{stats.get('applied', 0)} Applied, "
             f"{stats.get('skipped', 0)} Skipped"
         )
-
-        html = self._render_html(records, run_id, stats)
         msg.attach(MIMEText(html, "html", "utf-8"))
         return msg
 
@@ -86,7 +94,6 @@ class EmailReporter:
                 continue
             path = Path(rec.resume_path)
             if not path.exists():
-                logger.warning("Resume file not found for attachment: %s", path)
                 continue
             try:
                 data = path.read_bytes()
@@ -110,7 +117,6 @@ class EmailReporter:
         applied = [r for r in records if r.status == "logged"]
         skipped = [r for r in records if r.status == "skipped"]
         errors = [r for r in records if r.status == "error"]
-
         date_str = datetime.now().strftime("%B %d, %Y  %H:%M")
 
         applied_rows = ""
@@ -153,8 +159,7 @@ class EmailReporter:
                 <td>{r.notes[:80]}</td>
             </tr>"""
 
-        return f"""
-<!DOCTYPE html>
+        return f"""<!DOCTYPE html>
 <html>
 <head>
 <style>
@@ -179,9 +184,6 @@ class EmailReporter:
     tr:hover {{ background: #f8f9fa; }}
     a {{ color: #1a73e8; text-decoration: none; }}
     .footer {{ padding: 16px 32px; background: #f8f9fa; text-align: center; font-size: 12px; color: #888; }}
-    .badge {{ display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }}
-    .badge-applied {{ background: #e8f5e9; color: #2e7d32; }}
-    .badge-skipped {{ background: #fff3e0; color: #e65100; }}
 </style>
 </head>
 <body>
@@ -190,53 +192,29 @@ class EmailReporter:
         <h1>Job Application Agent — Daily Report</h1>
         <p>{date_str} &nbsp;|&nbsp; Run ID: {run_id}</p>
     </div>
-
     <div class="stats">
-        <div class="stat-box total">
-            <div class="stat-num">{stats.get('processed', 0)}</div>
-            <div class="stat-label">Processed</div>
-        </div>
-        <div class="stat-box applied">
-            <div class="stat-num">{stats.get('applied', 0)}</div>
-            <div class="stat-label">Applied</div>
-        </div>
-        <div class="stat-box skipped">
-            <div class="stat-num">{stats.get('skipped', 0)}</div>
-            <div class="stat-label">Skipped</div>
-        </div>
-        <div class="stat-box errors">
-            <div class="stat-num">{stats.get('errors', 0)}</div>
-            <div class="stat-label">Errors</div>
-        </div>
+        <div class="stat-box total"><div class="stat-num">{stats.get('processed', 0)}</div><div class="stat-label">Processed</div></div>
+        <div class="stat-box applied"><div class="stat-num">{stats.get('applied', 0)}</div><div class="stat-label">Applied</div></div>
+        <div class="stat-box skipped"><div class="stat-num">{stats.get('skipped', 0)}</div><div class="stat-label">Skipped</div></div>
+        <div class="stat-box errors"><div class="stat-num">{stats.get('errors', 0)}</div><div class="stat-label">Errors</div></div>
     </div>
-
     {"" if not applied else f'''
     <div class="section">
         <h2>Applied Jobs ({len(applied)})</h2>
         <p>Tailored resumes are attached to this email.</p>
         <table>
-            <tr>
-                <th>#</th><th>Code</th><th>Company</th><th>Position</th>
-                <th>Platform</th><th>Location</th><th>ATS</th><th>Link</th><th>Resume</th>
-            </tr>
+            <tr><th>#</th><th>Code</th><th>Company</th><th>Position</th><th>Platform</th><th>Location</th><th>ATS</th><th>Link</th><th>Resume</th></tr>
             {applied_rows}
         </table>
-    </div>
-    '''}
-
+    </div>'''}
     {"" if not skipped else f'''
     <div class="section">
         <h2>Skipped Jobs ({len(skipped)})</h2>
         <table>
-            <tr>
-                <th>#</th><th>Code</th><th>Company</th><th>Position</th>
-                <th>Platform</th><th>ATS</th><th>Reason</th>
-            </tr>
+            <tr><th>#</th><th>Code</th><th>Company</th><th>Position</th><th>Platform</th><th>ATS</th><th>Reason</th></tr>
             {skipped_rows}
         </table>
-    </div>
-    '''}
-
+    </div>'''}
     {"" if not errors else f'''
     <div class="section">
         <h2>Errors ({len(errors)})</h2>
@@ -244,11 +222,9 @@ class EmailReporter:
             <tr><th>#</th><th>Company</th><th>Position</th><th>Error</th></tr>
             {error_rows}
         </table>
-    </div>
-    '''}
-
+    </div>'''}
     <div class="footer">
-        Automated by Job Application Agent &nbsp;|&nbsp; 
+        Automated by Job Application Agent &nbsp;|&nbsp;
         <a href="https://github.com/kausynew-afk/Kausy">View on GitHub</a>
     </div>
 </div>

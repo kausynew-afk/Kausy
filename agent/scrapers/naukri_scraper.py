@@ -1,12 +1,12 @@
-"""Naukri.com (www.naukri.com) job scraper using their internal JSON API."""
+"""Naukri.com (www.naukri.com) job scraper — multi-keyword JSON API search."""
 
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
-import random
 from typing import Any
+from urllib.parse import quote
 
 from playwright.async_api import Page
 
@@ -24,53 +24,54 @@ EXPERIENCE_MAP = {
 
 
 class NaukriScraper(BaseScraper):
-    """Scrapes www.naukri.com using their internal jobapi/v3/search endpoint.
-
-    Naukri aggressively blocks headless browsers on their search pages,
-    so we use their JSON API directly which returns structured job data
-    without needing to parse HTML.
-    """
+    """Scrapes www.naukri.com using their internal jobapi/v3/search endpoint
+    with multiple search keywords for broader coverage."""
 
     @property
     def platform_name(self) -> str:
         return "naukri"
 
-    def _build_api_url(self, page_num: int = 1) -> str:
+    def _get_search_keywords(self) -> list[str]:
         profile = self.config["profile"]
-        scraping = self.config["scraping"]
+        keywords = profile.get("search_keywords", [])
+        if not keywords:
+            keywords = [profile.get("job_title", "Software Test Engineer")]
+        return keywords
 
-        keyword = profile["job_title"]
-        location = profile.get("location", "")
+    def _build_api_url(self, keyword: str, page_num: int = 1) -> str:
+        scraping = self.config["scraping"]
+        location = self.config["profile"].get("location", "")
         city = location.split(",")[0].strip() if location else ""
 
         exp_level = scraping.get("experience_level", "mid")
         exp_min, exp_max = EXPERIENCE_MAP.get(exp_level, (3, 7))
 
+        slug = keyword.lower().replace(" ", "-")
+        city_slug = city.lower().replace(" ", "-") if city else ""
+
         params = {
             "noOfResults": 20,
             "urlType": "search_by_key_loc",
             "searchType": "adv",
-            "keyword": keyword,
-            "location": city,
+            "keyword": quote(keyword),
+            "location": quote(city),
             "pageNo": page_num,
             "experience": exp_min,
-            "jobAge": scraping.get("posted_within_days", 7),
+            "jobAge": scraping.get("posted_within_days", 14),
             "sort": "r",
-            "seoKey": f"{keyword.lower().replace(' ', '-')}-jobs-in-{city.lower()}",
+            "seoKey": f"{slug}-jobs-in-{city_slug}" if city_slug else f"{slug}-jobs",
         }
 
         query = "&".join(f"{k}={v}" for k, v in params.items())
         return f"https://www.naukri.com/jobapi/v3/search?{query}"
 
-    def _build_search_url(self, page_num: int = 1) -> str:
+    def _build_search_url(self, keyword: str, page_num: int = 1) -> str:
         """Fallback: path-based search URL for browser scraping."""
-        profile = self.config["profile"]
         scraping = self.config["scraping"]
-
-        title_slug = profile["job_title"].lower().replace(" ", "-")
-        location = profile.get("location", "")
+        location = self.config["profile"].get("location", "")
         city = location.split(",")[0].strip().lower() if location else ""
 
+        title_slug = keyword.lower().replace(" ", "-")
         exp_level = scraping.get("experience_level", "mid")
         exp_min, _ = EXPERIENCE_MAP.get(exp_level, (3, 7))
 
@@ -79,40 +80,55 @@ class NaukriScraper(BaseScraper):
             path += f"-{page_num}"
 
         params = f"?experience={exp_min}"
-        days = scraping.get("posted_within_days", 7)
+        days = scraping.get("posted_within_days", 14)
         params += f"&jobAge={days}"
 
         return f"https://www.naukri.com{path}{params}"
 
     async def _scrape_listings(self, page: Page) -> list[JobListing]:
         max_results = self.config["scraping"].get("max_results_per_platform", 25)
+        keywords = self._get_search_keywords()
+        all_listings: list[JobListing] = []
+        seen_urls: set[str] = set()
 
-        # Strategy 1: Try the JSON API first (most reliable)
-        listings = await self._scrape_via_api(page, max_results)
-        if listings:
-            return listings
+        per_keyword = max(3, max_results // len(keywords))
 
-        # Strategy 2: Fallback to browser scraping with path-based URLs
-        logger.info("Naukri: API returned no results, trying browser scraping")
-        return await self._scrape_via_browser(page, max_results)
-
-    async def _scrape_via_api(self, page: Page, max_results: int) -> list[JobListing]:
-        """Use Naukri's internal JSON API to fetch job listings."""
-        listings: list[JobListing] = []
-        page_num = 1
-        max_pages = (max_results // 20) + 2
-
-        # Navigate to naukri.com first so fetch runs on same origin (avoids CORS)
+        # Navigate to naukri.com once to establish origin for API calls
         try:
             await page.goto("https://www.naukri.com", wait_until="domcontentloaded", timeout=20000)
             await asyncio.sleep(2)
         except Exception:
-            logger.warning("Naukri API: could not load naukri.com homepage")
-            return []
+            logger.warning("Naukri: could not load homepage, trying browser fallback")
+            return await self._scrape_via_browser_all(page, keywords, max_results)
 
-        while len(listings) < max_results and page_num <= max_pages:
-            api_url = self._build_api_url(page_num)
-            logger.info("Naukri API: requesting page %d", page_num)
+        for keyword in keywords:
+            if len(all_listings) >= max_results:
+                break
+
+            logger.info("Naukri API: searching for '%s'", keyword)
+            keyword_listings = await self._scrape_keyword_api(page, keyword, per_keyword)
+
+            for listing in keyword_listings:
+                if len(all_listings) >= max_results:
+                    break
+                if listing.url not in seen_urls:
+                    seen_urls.add(listing.url)
+                    all_listings.append(listing)
+
+        if not all_listings:
+            logger.info("Naukri API: 0 results across all keywords, trying browser fallback")
+            all_listings = await self._scrape_via_browser_all(page, keywords, max_results)
+
+        return all_listings
+
+    async def _scrape_keyword_api(self, page: Page, keyword: str, max_per: int) -> list[JobListing]:
+        """Search for one keyword via the JSON API."""
+        listings: list[JobListing] = []
+        page_num = 1
+        max_pages = 3
+
+        while len(listings) < max_per and page_num <= max_pages:
+            api_url = self._build_api_url(keyword, page_num)
 
             try:
                 response = await page.evaluate("""
@@ -132,24 +148,21 @@ class NaukriScraper(BaseScraper):
 
                 data = json.loads(response)
             except Exception as e:
-                logger.warning("Naukri API: failed on page %d: %s", page_num, e)
+                logger.warning("Naukri API: failed for '%s' page %d: %s", keyword, page_num, e)
                 break
 
             job_details = data.get("jobDetails", [])
             if not job_details:
-                logger.info("Naukri API: no jobs returned on page %d", page_num)
+                logger.info("Naukri API: no jobs for '%s' page %d", keyword, page_num)
                 break
 
-            logger.info("Naukri API: got %d jobs on page %d", len(job_details), page_num)
+            logger.info("Naukri API: got %d jobs for '%s' page %d", len(job_details), keyword, page_num)
 
             for job_data in job_details:
-                if len(listings) >= max_results:
+                if len(listings) >= max_per:
                     break
-
-                # Skip promoted/ad entries that lack real data
                 if job_data.get("type") == "ads" or not job_data.get("title"):
                     continue
-
                 listing = self._parse_api_job(job_data)
                 if listing:
                     listings.append(listing)
@@ -160,7 +173,6 @@ class NaukriScraper(BaseScraper):
         return listings
 
     def _parse_api_job(self, job: dict) -> JobListing | None:
-        """Parse a job entry from the Naukri API response."""
         title = job.get("title", "").strip()
         company = job.get("companyName", "").strip()
         jd_url = job.get("jdURL", "")
@@ -172,21 +184,19 @@ class NaukriScraper(BaseScraper):
             jd_url = f"https://www.naukri.com{jd_url}"
 
         location_parts = []
-        for loc in job.get("placeholders", []):
-            if loc.get("type") == "location":
-                location_parts.append(loc.get("label", ""))
-        location = ", ".join(location_parts) if location_parts else ""
-
         salary = ""
         experience = ""
         for ph in job.get("placeholders", []):
-            if ph.get("type") == "salary":
+            ph_type = ph.get("type", "")
+            if ph_type == "location":
+                location_parts.append(ph.get("label", ""))
+            elif ph_type == "salary":
                 salary = ph.get("label", "")
-            elif ph.get("type") == "experience":
+            elif ph_type == "experience":
                 experience = ph.get("label", "")
 
+        location = ", ".join(location_parts) if location_parts else ""
         description = job.get("jobDescription", "")
-
         tags = job.get("tagsAndSkills", "")
         if tags:
             description += f"\n\nKey Skills: {tags}"
@@ -207,57 +217,64 @@ class NaukriScraper(BaseScraper):
             job_code=job_code or None,
         )
 
-    async def _scrape_via_browser(self, page: Page, max_results: int) -> list[JobListing]:
-        """Fallback: scrape Naukri using browser with path-based URLs."""
-        listings: list[JobListing] = []
-        page_num = 1
-        max_pages = (max_results // 20) + 2
+    async def _scrape_via_browser_all(self, page: Page, keywords: list[str], max_results: int) -> list[JobListing]:
+        """Fallback: browser-based scraping across multiple keywords."""
+        all_listings: list[JobListing] = []
+        seen_urls: set[str] = set()
+        per_keyword = max(3, max_results // len(keywords))
 
-        while len(listings) < max_results and page_num <= max_pages:
-            url = self._build_search_url(page_num)
-            logger.info("Naukri browser: navigating to %s", url)
-
-            try:
-                await page.goto(url, wait_until="networkidle", timeout=30000)
-            except Exception:
-                logger.warning("Naukri browser: timed out on page %d", page_num)
+        for keyword in keywords:
+            if len(all_listings) >= max_results:
                 break
 
-            await self._throttle()
+            logger.info("Naukri browser: searching for '%s'", keyword)
+            page_num = 1
 
-            for _ in range(4):
-                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                await page.wait_for_timeout(2000)
+            while len(all_listings) < max_results and page_num <= 2:
+                url = self._build_search_url(keyword, page_num)
+                logger.info("Naukri browser: navigating to %s", url)
 
-            job_cards = await page.query_selector_all(
-                "div.srp-jobtuple-wrapper, "
-                "article.jobTuple, "
-                "div[class*='jobTuple'], "
-                "div[data-job-id]"
-            )
-
-            if not job_cards:
-                logger.info("Naukri browser: no cards on page %d", page_num)
-                break
-
-            logger.info("Naukri browser: found %d cards on page %d", len(job_cards), page_num)
-
-            for card in job_cards:
-                if len(listings) >= max_results:
-                    break
                 try:
-                    listing = await self._parse_browser_card(card)
-                    if listing:
-                        listings.append(listing)
+                    await page.goto(url, wait_until="networkidle", timeout=30000)
                 except Exception:
-                    logger.debug("Naukri browser: card parse failed, skipping")
+                    logger.warning("Naukri browser: timed out for '%s'", keyword)
+                    break
 
-            page_num += 1
+                await self._throttle()
 
-        return listings
+                for _ in range(3):
+                    await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    await page.wait_for_timeout(1500)
+
+                job_cards = await page.query_selector_all(
+                    "div.srp-jobtuple-wrapper, "
+                    "article.jobTuple, "
+                    "div[class*='jobTuple'], "
+                    "div[data-job-id]"
+                )
+
+                if not job_cards:
+                    break
+
+                logger.info("Naukri browser: %d cards for '%s'", len(job_cards), keyword)
+                count = 0
+                for card in job_cards:
+                    if count >= per_keyword or len(all_listings) >= max_results:
+                        break
+                    try:
+                        listing = await self._parse_browser_card(card)
+                        if listing and listing.url not in seen_urls:
+                            seen_urls.add(listing.url)
+                            all_listings.append(listing)
+                            count += 1
+                    except Exception:
+                        pass
+
+                page_num += 1
+
+        return all_listings
 
     async def _parse_browser_card(self, card: Any) -> JobListing | None:
-        """Parse a job card from the browser DOM."""
         title_el = await card.query_selector("a.title, a.comp-name, h2 a")
         company_el = await card.query_selector("a.comp-name, a.subTitle, span.comp-name")
         location_el = await card.query_selector("span.loc-wrap, span.loc, span.locWdth")

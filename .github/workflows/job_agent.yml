@@ -33,11 +33,30 @@ jobs:
           pip install -r requirements.txt
           playwright install chromium --with-deps
 
-      - name: Run agent and send email report
+      - name: Run agent
         env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python main.py --config config.yaml
+
+      - name: Send email report
+        if: always() && hashFiles('output/email_report.html') != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER || 'smtp.gmail.com' }}
+          server_port: ${{ secrets.SMTP_PORT || '587' }}
+          username: ${{ secrets.SMTP_USER || secrets.GMAIL_USER }}
+          password: ${{ secrets.SMTP_PASSWORD || secrets.GMAIL_APP_PASSWORD }}
+          to: kausynew@gmail.com
+          from: Job Application Agent
+          subject: "Job Agent Report — ${{ github.run_id }}"
+          html_body: file://output/email_report.html
+          attachments: output/*.md
+        continue-on-error: true
 
       - name: Upload run artifacts
         if: always()

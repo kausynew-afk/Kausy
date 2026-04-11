@@ -1,4 +1,4 @@
-"""Indeed job scraper using Playwright."""
+"""Indeed job scraper using Playwright — multi-keyword search."""
 
 from __future__ import annotations
 
@@ -27,36 +27,47 @@ INDEED_DOMAIN_MAP = {
     "pune": "https://in.indeed.com",
     "mumbai": "https://in.indeed.com",
     "bangalore": "https://in.indeed.com",
+    "bengaluru": "https://in.indeed.com",
     "delhi": "https://in.indeed.com",
     "hyderabad": "https://in.indeed.com",
     "chennai": "https://in.indeed.com",
     "kolkata": "https://in.indeed.com",
+    "noida": "https://in.indeed.com",
+    "gurgaon": "https://in.indeed.com",
+    "gurugram": "https://in.indeed.com",
 }
 
 
 class IndeedScraper(BaseScraper):
-    """Scrapes Indeed's public job search results."""
+    """Scrapes Indeed's public job search results with multiple keywords."""
 
     @property
     def platform_name(self) -> str:
         return "indeed"
 
+    def _get_search_keywords(self) -> list[str]:
+        profile = self.config["profile"]
+        keywords = profile.get("search_keywords", [])
+        if not keywords:
+            keywords = [profile.get("job_title", "Software Test Engineer")]
+        return keywords
+
     def _get_base_url(self) -> str:
-        """Pick the right Indeed domain based on location."""
         location = self.config["profile"].get("location", "").lower()
         for keyword, domain in INDEED_DOMAIN_MAP.items():
             if keyword in location:
                 return domain
         return "https://www.indeed.com"
 
-    def _build_url(self, start: int = 0) -> str:
-        profile = self.config["profile"]
+    def _build_url(self, keyword: str, start: int = 0) -> str:
         scraping = self.config["scraping"]
         base = self._get_base_url()
+        location = self.config["profile"].get("location", "")
+        city = location.split(",")[0].strip() if location else location
 
         params: dict[str, str] = {
-            "q": profile["job_title"],
-            "l": profile["location"],
+            "q": keyword,
+            "l": city,
             "start": str(start),
         }
 
@@ -77,49 +88,72 @@ class IndeedScraper(BaseScraper):
 
     async def _scrape_listings(self, page: Page) -> list[JobListing]:
         max_results = self.config["scraping"].get("max_results_per_platform", 25)
-        listings: list[JobListing] = []
-        start = 0
+        keywords = self._get_search_keywords()
+        all_listings: list[JobListing] = []
+        seen_urls: set[str] = set()
         base = self._get_base_url()
 
-        while len(listings) < max_results:
-            url = self._build_url(start)
-            logger.info("Indeed: navigating to %s", url)
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await self._throttle()
+        per_keyword = max(3, max_results // len(keywords))
 
-            job_cards = await page.query_selector_all(
-                "div.job_seen_beacon, div.jobsearch-ResultsList div.result, "
-                "td.resultContent, div[class*='jobCard'], div[class*='job_seen']"
-            )
-
-            if not job_cards:
-                logger.info("Indeed: no more cards found, stopping pagination")
+        for keyword in keywords:
+            if len(all_listings) >= max_results:
                 break
 
-            logger.info("Indeed: found %d cards on page %d", len(job_cards), start // 10 + 1)
+            logger.info("Indeed: searching for '%s'", keyword)
+            start = 0
+            keyword_count = 0
 
-            for card in job_cards:
-                if len(listings) >= max_results:
-                    break
+            while keyword_count < per_keyword and len(all_listings) < max_results:
+                url = self._build_url(keyword, start)
+                logger.info("Indeed: navigating to %s", url)
+
                 try:
-                    listing = await self._parse_card(card, page, base)
-                    if listing:
-                        listings.append(listing)
+                    await page.goto(url, wait_until="domcontentloaded", timeout=30000)
                 except Exception:
-                    logger.debug("Indeed: failed to parse a card, skipping")
+                    logger.warning("Indeed: timed out for '%s' page %d", keyword, start // 10 + 1)
+                    break
+                await self._throttle()
 
-            start += 10
+                job_cards = await page.query_selector_all(
+                    "div.job_seen_beacon, div.jobsearch-ResultsList div.result, "
+                    "td.resultContent, div[class*='jobCard'], div[class*='job_seen'], "
+                    "div.slider_container div.slider_item, li div.cardOutline"
+                )
 
-        return listings
+                if not job_cards:
+                    logger.info("Indeed: no cards for '%s' on page %d", keyword, start // 10 + 1)
+                    break
+
+                logger.info("Indeed: found %d cards for '%s' page %d", len(job_cards), keyword, start // 10 + 1)
+
+                for card in job_cards:
+                    if keyword_count >= per_keyword or len(all_listings) >= max_results:
+                        break
+                    try:
+                        listing = await self._parse_card(card, page, base)
+                        if listing and listing.url not in seen_urls:
+                            seen_urls.add(listing.url)
+                            all_listings.append(listing)
+                            keyword_count += 1
+                    except Exception:
+                        logger.debug("Indeed: failed to parse a card, skipping")
+
+                start += 10
+                if start >= 30:
+                    break
+
+        return all_listings
 
     async def _parse_card(self, card: Any, page: Page, base: str) -> JobListing | None:
         title_el = await card.query_selector(
             "h2.jobTitle a span, a.jcs-JobTitle span, "
-            "h2 a span[id^='jobTitle'], span[title]"
+            "h2 a span[id^='jobTitle'], span[title], "
+            "h2.jobTitle span"
         )
         company_el = await card.query_selector(
             "span[data-testid='company-name'], span.css-63koeb, "
-            "span.companyName, a[data-tn-element='companyName']"
+            "span.companyName, a[data-tn-element='companyName'], "
+            "span[data-testid='company-name'] a"
         )
         location_el = await card.query_selector(
             "div[data-testid='text-location'], div.css-1p0sjhy, "

@@ -31,6 +31,7 @@ JOB_TYPE_MAP = {
 TIME_FILTER_MAP = {
     1: "r86400",
     7: "r604800",
+    14: "r1209600",
     30: "r2592000",
 }
 
@@ -42,15 +43,23 @@ class LinkedInScraper(BaseScraper):
     def platform_name(self) -> str:
         return "linkedin"
 
-    def _build_url(self) -> str:
+    def _get_search_keywords(self) -> list[str]:
         profile = self.config["profile"]
+        keywords = profile.get("search_keywords", [])
+        if not keywords:
+            keywords = [profile.get("job_title", "Software Test Engineer")]
+        return keywords
+
+    def _build_url(self, keyword: str, start: int = 0) -> str:
         scraping = self.config["scraping"]
+        location = self.config["profile"]["location"]
 
         params: dict[str, str] = {
-            "keywords": profile["job_title"],
-            "location": profile["location"],
+            "keywords": keyword,
+            "location": location,
             "origin": "JOB_SEARCH_PAGE_SEARCH_BUTTON",
             "refresh": "true",
+            "start": str(start),
         }
 
         exp = scraping.get("experience_level", "")
@@ -68,32 +77,49 @@ class LinkedInScraper(BaseScraper):
         return "https://www.linkedin.com/jobs/search/?" + urllib.parse.urlencode(params)
 
     async def _scrape_listings(self, page: Page) -> list[JobListing]:
-        url = self._build_url()
         max_results = self.config["scraping"].get("max_results_per_platform", 25)
-        listings: list[JobListing] = []
+        keywords = self._get_search_keywords()
+        all_listings: list[JobListing] = []
+        seen_urls: set[str] = set()
 
-        logger.info("LinkedIn: navigating to %s", url)
-        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-        await self._throttle()
+        per_keyword = max(5, max_results // len(keywords))
 
-        for _ in range(3):
-            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            await page.wait_for_timeout(2000)
+        for keyword in keywords:
+            if len(all_listings) >= max_results:
+                break
 
-        job_cards = await page.query_selector_all(
-            "div.base-card, li.result-card, div.job-search-card"
-        )
-        logger.info("LinkedIn: found %d raw cards", len(job_cards))
-
-        for card in job_cards[:max_results]:
+            logger.info("LinkedIn: searching for '%s'", keyword)
+            url = self._build_url(keyword)
             try:
-                listing = await self._parse_card(card, page)
-                if listing:
-                    listings.append(listing)
+                await page.goto(url, wait_until="domcontentloaded", timeout=30000)
             except Exception:
-                logger.debug("LinkedIn: failed to parse a card, skipping")
+                logger.warning("LinkedIn: timed out for keyword '%s', skipping", keyword)
+                continue
+            await self._throttle()
 
-        return listings
+            for _ in range(3):
+                await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                await page.wait_for_timeout(2000)
+
+            job_cards = await page.query_selector_all(
+                "div.base-card, li.result-card, div.job-search-card"
+            )
+            logger.info("LinkedIn: found %d cards for '%s'", len(job_cards), keyword)
+
+            count = 0
+            for card in job_cards:
+                if count >= per_keyword or len(all_listings) >= max_results:
+                    break
+                try:
+                    listing = await self._parse_card(card, page)
+                    if listing and listing.url not in seen_urls:
+                        seen_urls.add(listing.url)
+                        all_listings.append(listing)
+                        count += 1
+                except Exception:
+                    logger.debug("LinkedIn: failed to parse a card, skipping")
+
+        return all_listings
 
     async def _parse_card(self, card: Any, page: Page) -> JobListing | None:
         title_el = await card.query_selector(
@@ -133,7 +159,6 @@ class LinkedInScraper(BaseScraper):
         )
 
     async def _fetch_description(self, page: Page, url: str) -> str:
-        """Navigate to job detail page and extract the description."""
         try:
             detail_page = await page.context.new_page()
             await detail_page.goto(url, wait_until="domcontentloaded", timeout=20000)

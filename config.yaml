@@ -7,6 +7,17 @@ profile:
   location: "Pune, India"
   master_resume_path: "data/resumes/master_resume.md"
 
+  # Multiple search queries — agent searches for EACH keyword across all platforms
+  search_keywords:
+    - "Software Test Engineer"
+    - "QA Engineer"
+    - "Test Engineer"
+    - "QA Automation Engineer"
+    - "SDET"
+    - "Software Tester"
+    - "Quality Assurance Engineer"
+    - "Automation Test Engineer"
+
 scraping:
   platforms:
     - linkedin
@@ -16,7 +27,7 @@ scraping:
   search_radius_miles: 50
   experience_level: "mid"            # entry, mid, senior, lead
   job_type: "full-time"              # full-time, part-time, contract, remote
-  posted_within_days: 7
+  posted_within_days: 14
 
 ats:
   target_score: 70                   # minimum ATS match % before accepting
@@ -29,9 +40,9 @@ ats:
     experience_years: 0.10
 
 safety:
-  min_delay_seconds: 5
-  max_delay_seconds: 15
-  max_applications_per_run: 10
+  min_delay_seconds: 3
+  max_delay_seconds: 8
+  max_applications_per_run: 20
   duplicate_check_db: "data/logs/applied_jobs.json"
   rotate_user_agents: true
 
