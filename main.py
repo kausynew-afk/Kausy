@@ -70,13 +70,15 @@ Examples:
     orchestrator = Orchestrator(config)
     run_result = asyncio.run(orchestrator.run())
 
-    # Send email report if configured
-    emailer = EmailReporter(config)
-    emailer.send_report(
-        records=run_result["records"],
-        run_id=run_result["run_id"],
-        stats=run_result,
-    )
+    try:
+        emailer = EmailReporter(config)
+        emailer.send_report(
+            records=run_result["records"],
+            run_id=run_result["run_id"],
+            stats=run_result,
+        )
+    except Exception as e:
+        logger.warning("Email report failed (non-fatal): %s", e)
 
 
 if __name__ == "__main__":

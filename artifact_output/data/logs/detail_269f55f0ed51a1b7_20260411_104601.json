@@ -1,0 +1,31 @@
+{
+  "job": {
+    "uid": "269f55f0ed51a1b7",
+    "job_code": "LI-4371178073",
+    "title": "DFT Engineer",
+    "company": "eInfochips (An Arrow Company)",
+    "location": "Pune District, Maharashtra, India",
+    "platform": "linkedin",
+    "url": "https://in.linkedin.com/jobs/view/dft-engineer-at-einfochips-an-arrow-company-4371178073"
+  },
+  "ats": {
+    "overall_score": 72.5,
+    "iteration": 1,
+    "technical_matches": [
+      "r"
+    ],
+    "technical_missing": [
+      "go"
+    ],
+    "soft_skill_matches": [],
+    "soft_skill_missing": [],
+    "cert_matches": [],
+    "cert_missing": []
+  },
+  "action": "Applied",
+  "status": "logged",
+  "resume_file": "LI-4371178073_eInfochipsAnArrowCompany_DFTEngineer_2026-04-11.md",
+  "resume_path": "output/LI-4371178073_eInfochipsAnArrowCompany_DFTEngineer_2026-04-11.md",
+  "applied_at": "2026-04-11T10:47:35.165168",
+  "notes": ""
+}

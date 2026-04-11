@@ -1,0 +1,67 @@
+{
+  "job": {
+    "uid": "4d1bb6c1f7cb5e32",
+    "job_code": "LI-4398867008",
+    "title": "Salesforce Test Engineer",
+    "company": "Barclays",
+    "location": "Pune Division, Maharashtra, India",
+    "platform": "linkedin",
+    "url": "https://in.linkedin.com/jobs/view/salesforce-test-engineer-at-barclays-4398867008"
+  },
+  "ats": {
+    "overall_score": 66.4,
+    "iteration": 3,
+    "technical_matches": [
+      "agile",
+      "api",
+      "ci/cd",
+      "git",
+      "java",
+      "jenkins",
+      "jira",
+      "page object model",
+      "playwright",
+      "pom",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "testng"
+    ],
+    "technical_missing": [
+      "azure",
+      "bdd",
+      "css",
+      "cucumber",
+      "cypress",
+      "design patterns",
+      "devops",
+      "excel",
+      "github actions",
+      "go",
+      "oop",
+      "salesforce",
+      "security"
+    ],
+    "soft_skill_matches": [
+      "collaboration",
+      "cross-functional",
+      "root cause analysis"
+    ],
+    "soft_skill_missing": [
+      "attention to detail",
+      "decision making",
+      "innovation",
+      "leadership",
+      "strategic thinking"
+    ],
+    "cert_matches": [],
+    "cert_missing": []
+  },
+  "action": "Skipped",
+  "status": "skipped",
+  "resume_file": "",
+  "resume_path": "",
+  "applied_at": "2026-04-11T10:47:35.177708",
+  "notes": "ATS score 66.4% below target 70% after 3 iterations"
+}

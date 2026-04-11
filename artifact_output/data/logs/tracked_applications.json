@@ -1,0 +1,576 @@
+[
+  {
+    "company": "StarApps Studio",
+    "position": "QA Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/qa-engineer-at-starapps-studio-4397835671",
+    "salary": "Not disclosed",
+    "ats_score": 68.2,
+    "status": "skipped",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_StarApps_Studio_QA_Engineer_20260411_153208.md",
+    "matched_skills": [
+      "api",
+      "playwright",
+      "postman",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "sql"
+    ],
+    "missing_skills": [
+      "aws",
+      "azure",
+      "cypress",
+      "gcp",
+      "python",
+      "security"
+    ],
+    "matched_soft_skills": [
+      "collaboration"
+    ],
+    "matched_certs": [],
+    "notes": "ATS score 68.2% below target 70% after 3 iterations"
+  },
+  {
+    "company": "Siemens Energy",
+    "position": "Quality Assurance Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/quality-assurance-engineer-at-siemens-energy-4386856290",
+    "salary": "Not disclosed",
+    "ats_score": 48.8,
+    "status": "skipped",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_Siemens_Energy_Quality_Assurance_Engineer_20260411_153208.md",
+    "matched_skills": [
+      "agile",
+      "api",
+      "ci/cd",
+      "git",
+      "java",
+      "jenkins",
+      "jira",
+      "playwright",
+      "postman",
+      "r",
+      "rest",
+      "rest assured"
+    ],
+    "missing_skills": [
+      "azure",
+      "c#",
+      "devops",
+      "excel",
+      "github actions",
+      "go",
+      "python",
+      "scrum",
+      "typescript"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "communication",
+      "cross-functional"
+    ],
+    "matched_certs": [],
+    "notes": "ATS score 48.8% below target 70% after 3 iterations"
+  },
+  {
+    "company": "OUTSCALE",
+    "position": "Operational QA Engineer",
+    "platform": "linkedin",
+    "location": "Pune/Pimpri-Chinchwad Area",
+    "url": "https://in.linkedin.com/jobs/view/operational-qa-engineer-at-outscale-4397770375",
+    "salary": "Not disclosed",
+    "ats_score": 55.8,
+    "status": "skipped",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_OUTSCALE_Operational_QA_Engineer_20260411_153208.md",
+    "matched_skills": [
+      "api",
+      "java",
+      "linux",
+      "r"
+    ],
+    "missing_skills": [
+      "aws",
+      "go",
+      "javascript",
+      "python"
+    ],
+    "matched_soft_skills": [],
+    "matched_certs": [],
+    "notes": "ATS score 55.8% below target 70% after 3 iterations"
+  },
+  {
+    "company": "Williams-Sonoma, Inc.",
+    "position": "Automation Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/automation-engineer-at-williams-sonoma-inc-4079934536",
+    "salary": "Not disclosed",
+    "ats_score": 75.5,
+    "status": "logged",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_Williams_Sonoma__Inc__Automation_Engineer_20260411_153208.md",
+    "matched_skills": [
+      "agile",
+      "api",
+      "ci/cd",
+      "data-driven",
+      "java",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "soap",
+      "sql",
+      "testng"
+    ],
+    "missing_skills": [
+      "cucumber",
+      "devops",
+      "excel",
+      "go",
+      "machine learning"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "communication"
+    ],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "company": "EPAM Systems",
+    "position": "Software Engineer – Salesforce Testing",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/software-engineer-%E2%80%93-salesforce-testing-at-epam-systems-4384036787",
+    "salary": "Not disclosed",
+    "ats_score": 73.5,
+    "status": "logged",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_EPAM_Systems_Software_Engineer___Salesforce_Testing_20260411_153208.md",
+    "matched_skills": [
+      "r"
+    ],
+    "missing_skills": [
+      "salesforce"
+    ],
+    "matched_soft_skills": [
+      "cross-functional"
+    ],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "company": "Barclays",
+    "position": "Automation Test Engineer - BA4",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/automation-test-engineer-ba4-at-barclays-4398851818",
+    "salary": "Not disclosed",
+    "ats_score": 77.6,
+    "status": "logged",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_Barclays_Automation_Test_Engineer___BA4_20260411_153208.md",
+    "matched_skills": [
+      "git",
+      "java",
+      "r",
+      "scala",
+      "unix"
+    ],
+    "missing_skills": [
+      "excel",
+      "go"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "communication",
+      "cross-functional",
+      "root cause analysis"
+    ],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "company": "eInfochips (An Arrow Company)",
+    "position": "DFT Engineer",
+    "platform": "linkedin",
+    "location": "Pune District, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/dft-engineer-at-einfochips-an-arrow-company-4371178073",
+    "salary": "Not disclosed",
+    "ats_score": 72.5,
+    "status": "logged",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_eInfochips__An_Arrow_Company__DFT_Engineer_20260411_153208.md",
+    "matched_skills": [
+      "r"
+    ],
+    "missing_skills": [
+      "go"
+    ],
+    "matched_soft_skills": [],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "company": "Barclays",
+    "position": "Salesforce Test Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/salesforce-test-engineer-at-barclays-4398867008",
+    "salary": "Not disclosed",
+    "ats_score": 66.4,
+    "status": "skipped",
+    "applied_date": "2026-04-11 15:37",
+    "resume_path": "output\\resume_Barclays_Salesforce_Test_Engineer_20260411_153208.md",
+    "matched_skills": [
+      "agile",
+      "api",
+      "ci/cd",
+      "git",
+      "java",
+      "jenkins",
+      "jira",
+      "page object model",
+      "playwright",
+      "pom",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "testng"
+    ],
+    "missing_skills": [
+      "azure",
+      "bdd",
+      "css",
+      "cucumber",
+      "cypress",
+      "design patterns",
+      "devops",
+      "excel",
+      "github actions",
+      "go",
+      "oop",
+      "salesforce",
+      "security"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "cross-functional",
+      "root cause analysis"
+    ],
+    "matched_certs": [],
+    "notes": "ATS score 66.4% below target 70% after 3 iterations"
+  },
+  {
+    "job_code": "LI-4397835671",
+    "company": "StarApps Studio",
+    "position": "QA Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/qa-engineer-at-starapps-studio-4397835671",
+    "salary": "Not disclosed",
+    "ats_score": 68.2,
+    "status": "skipped",
+    "action": "Skipped",
+    "reason": "ATS score 68.2% below target 70% after 3 iterations",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "",
+    "resume_path": "",
+    "matched_skills": [
+      "api",
+      "playwright",
+      "postman",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "sql"
+    ],
+    "missing_skills": [
+      "aws",
+      "azure",
+      "cypress",
+      "gcp",
+      "python",
+      "security"
+    ],
+    "matched_soft_skills": [
+      "collaboration"
+    ],
+    "matched_certs": [],
+    "notes": "ATS score 68.2% below target 70% after 3 iterations"
+  },
+  {
+    "job_code": "LI-4386856290",
+    "company": "Siemens Energy",
+    "position": "Quality Assurance Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/quality-assurance-engineer-at-siemens-energy-4386856290",
+    "salary": "Not disclosed",
+    "ats_score": 48.8,
+    "status": "skipped",
+    "action": "Skipped",
+    "reason": "ATS score 48.8% below target 70% after 3 iterations",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "",
+    "resume_path": "",
+    "matched_skills": [
+      "agile",
+      "api",
+      "ci/cd",
+      "git",
+      "java",
+      "jenkins",
+      "jira",
+      "playwright",
+      "postman",
+      "r",
+      "rest",
+      "rest assured"
+    ],
+    "missing_skills": [
+      "azure",
+      "c#",
+      "devops",
+      "excel",
+      "github actions",
+      "go",
+      "python",
+      "scrum",
+      "typescript"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "communication",
+      "cross-functional"
+    ],
+    "matched_certs": [],
+    "notes": "ATS score 48.8% below target 70% after 3 iterations"
+  },
+  {
+    "job_code": "LI-4397770375",
+    "company": "OUTSCALE",
+    "position": "Operational QA Engineer",
+    "platform": "linkedin",
+    "location": "Pune/Pimpri-Chinchwad Area",
+    "url": "https://in.linkedin.com/jobs/view/operational-qa-engineer-at-outscale-4397770375",
+    "salary": "Not disclosed",
+    "ats_score": 55.8,
+    "status": "skipped",
+    "action": "Skipped",
+    "reason": "ATS score 55.8% below target 70% after 3 iterations",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "",
+    "resume_path": "",
+    "matched_skills": [
+      "api",
+      "java",
+      "linux",
+      "r"
+    ],
+    "missing_skills": [
+      "aws",
+      "go",
+      "javascript",
+      "python"
+    ],
+    "matched_soft_skills": [],
+    "matched_certs": [],
+    "notes": "ATS score 55.8% below target 70% after 3 iterations"
+  },
+  {
+    "job_code": "LI-4079934536",
+    "company": "Williams-Sonoma, Inc.",
+    "position": "Automation Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/automation-engineer-at-williams-sonoma-inc-4079934536",
+    "salary": "Not disclosed",
+    "ats_score": 75.5,
+    "status": "logged",
+    "action": "Applied",
+    "reason": "",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "LI-4079934536_WilliamsSonomaInc_AutomationEngineer_2026-04-11.md",
+    "resume_path": "output/LI-4079934536_WilliamsSonomaInc_AutomationEngineer_2026-04-11.md",
+    "matched_skills": [
+      "agile",
+      "api",
+      "ci/cd",
+      "data-driven",
+      "java",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "soap",
+      "sql",
+      "testng"
+    ],
+    "missing_skills": [
+      "cucumber",
+      "devops",
+      "excel",
+      "go",
+      "machine learning"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "communication"
+    ],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "job_code": "LI-4384036787",
+    "company": "EPAM Systems",
+    "position": "Software Engineer – Salesforce Testing",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/software-engineer-%E2%80%93-salesforce-testing-at-epam-systems-4384036787",
+    "salary": "Not disclosed",
+    "ats_score": 73.5,
+    "status": "logged",
+    "action": "Applied",
+    "reason": "",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "LI-4384036787_EPAMSystems_SoftwareEngineerSalesforceTesting_2026-04-11.md",
+    "resume_path": "output/LI-4384036787_EPAMSystems_SoftwareEngineerSalesforceTesting_2026-04-11.md",
+    "matched_skills": [
+      "r"
+    ],
+    "missing_skills": [
+      "salesforce"
+    ],
+    "matched_soft_skills": [
+      "cross-functional"
+    ],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "job_code": "LI-4398851818",
+    "company": "Barclays",
+    "position": "Automation Test Engineer - BA4",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/automation-test-engineer-ba4-at-barclays-4398851818",
+    "salary": "Not disclosed",
+    "ats_score": 77.6,
+    "status": "logged",
+    "action": "Applied",
+    "reason": "",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "LI-4398851818_Barclays_AutomationTestEngineerBA4_2026-04-11.md",
+    "resume_path": "output/LI-4398851818_Barclays_AutomationTestEngineerBA4_2026-04-11.md",
+    "matched_skills": [
+      "git",
+      "java",
+      "r",
+      "scala",
+      "unix"
+    ],
+    "missing_skills": [
+      "excel",
+      "go"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "communication",
+      "cross-functional",
+      "root cause analysis"
+    ],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "job_code": "LI-4371178073",
+    "company": "eInfochips (An Arrow Company)",
+    "position": "DFT Engineer",
+    "platform": "linkedin",
+    "location": "Pune District, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/dft-engineer-at-einfochips-an-arrow-company-4371178073",
+    "salary": "Not disclosed",
+    "ats_score": 72.5,
+    "status": "logged",
+    "action": "Applied",
+    "reason": "",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "LI-4371178073_eInfochipsAnArrowCompany_DFTEngineer_2026-04-11.md",
+    "resume_path": "output/LI-4371178073_eInfochipsAnArrowCompany_DFTEngineer_2026-04-11.md",
+    "matched_skills": [
+      "r"
+    ],
+    "missing_skills": [
+      "go"
+    ],
+    "matched_soft_skills": [],
+    "matched_certs": [],
+    "notes": ""
+  },
+  {
+    "job_code": "LI-4398867008",
+    "company": "Barclays",
+    "position": "Salesforce Test Engineer",
+    "platform": "linkedin",
+    "location": "Pune Division, Maharashtra, India",
+    "url": "https://in.linkedin.com/jobs/view/salesforce-test-engineer-at-barclays-4398867008",
+    "salary": "Not disclosed",
+    "ats_score": 66.4,
+    "status": "skipped",
+    "action": "Skipped",
+    "reason": "ATS score 66.4% below target 70% after 3 iterations",
+    "applied_date": "2026-04-11 10:47",
+    "resume_file": "",
+    "resume_path": "",
+    "matched_skills": [
+      "agile",
+      "api",
+      "ci/cd",
+      "git",
+      "java",
+      "jenkins",
+      "jira",
+      "page object model",
+      "playwright",
+      "pom",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "testng"
+    ],
+    "missing_skills": [
+      "azure",
+      "bdd",
+      "css",
+      "cucumber",
+      "cypress",
+      "design patterns",
+      "devops",
+      "excel",
+      "github actions",
+      "go",
+      "oop",
+      "salesforce",
+      "security"
+    ],
+    "matched_soft_skills": [
+      "collaboration",
+      "cross-functional",
+      "root cause analysis"
+    ],
+    "matched_certs": [],
+    "notes": "ATS score 66.4% below target 70% after 3 iterations"
+  }
+]

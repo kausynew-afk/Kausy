@@ -1,0 +1,56 @@
+{
+  "job": {
+    "uid": "8a1f7310775a3b5a",
+    "job_code": "LI-4079934536",
+    "title": "Automation Engineer",
+    "company": "Williams-Sonoma, Inc.",
+    "location": "Pune Division, Maharashtra, India",
+    "platform": "linkedin",
+    "url": "https://in.linkedin.com/jobs/view/automation-engineer-at-williams-sonoma-inc-4079934536"
+  },
+  "ats": {
+    "overall_score": 75.5,
+    "iteration": 1,
+    "technical_matches": [
+      "agile",
+      "api",
+      "ci/cd",
+      "data-driven",
+      "java",
+      "r",
+      "rest",
+      "scala",
+      "selenium",
+      "soap",
+      "sql",
+      "testng"
+    ],
+    "technical_missing": [
+      "cucumber",
+      "devops",
+      "excel",
+      "go",
+      "machine learning"
+    ],
+    "soft_skill_matches": [
+      "collaboration",
+      "communication"
+    ],
+    "soft_skill_missing": [
+      "analytical",
+      "decision making",
+      "innovation",
+      "interpersonal",
+      "negotiation",
+      "presentation"
+    ],
+    "cert_matches": [],
+    "cert_missing": []
+  },
+  "action": "Applied",
+  "status": "logged",
+  "resume_file": "LI-4079934536_WilliamsSonomaInc_AutomationEngineer_2026-04-11.md",
+  "resume_path": "output/LI-4079934536_WilliamsSonomaInc_AutomationEngineer_2026-04-11.md",
+  "applied_at": "2026-04-11T10:47:35.154661",
+  "notes": ""
+}

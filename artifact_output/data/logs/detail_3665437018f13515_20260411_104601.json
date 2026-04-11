@@ -1,0 +1,33 @@
+{
+  "job": {
+    "uid": "3665437018f13515",
+    "job_code": "LI-4384036787",
+    "title": "Software Engineer \u2013 Salesforce Testing",
+    "company": "EPAM Systems",
+    "location": "Pune Division, Maharashtra, India",
+    "platform": "linkedin",
+    "url": "https://in.linkedin.com/jobs/view/software-engineer-%E2%80%93-salesforce-testing-at-epam-systems-4384036787"
+  },
+  "ats": {
+    "overall_score": 73.5,
+    "iteration": 1,
+    "technical_matches": [
+      "r"
+    ],
+    "technical_missing": [
+      "salesforce"
+    ],
+    "soft_skill_matches": [
+      "cross-functional"
+    ],
+    "soft_skill_missing": [],
+    "cert_matches": [],
+    "cert_missing": []
+  },
+  "action": "Applied",
+  "status": "logged",
+  "resume_file": "LI-4384036787_EPAMSystems_SoftwareEngineerSalesforceTesting_2026-04-11.md",
+  "resume_path": "output/LI-4384036787_EPAMSystems_SoftwareEngineerSalesforceTesting_2026-04-11.md",
+  "applied_at": "2026-04-11T10:47:35.157613",
+  "notes": ""
+}

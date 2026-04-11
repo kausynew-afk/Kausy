@@ -1,0 +1,39 @@
+{
+  "job": {
+    "uid": "08616b8a3c05e4aa",
+    "job_code": "LI-4397770375",
+    "title": "Operational QA Engineer",
+    "company": "OUTSCALE",
+    "location": "Pune/Pimpri-Chinchwad Area",
+    "platform": "linkedin",
+    "url": "https://in.linkedin.com/jobs/view/operational-qa-engineer-at-outscale-4397770375"
+  },
+  "ats": {
+    "overall_score": 55.8,
+    "iteration": 3,
+    "technical_matches": [
+      "api",
+      "java",
+      "linux",
+      "r"
+    ],
+    "technical_missing": [
+      "aws",
+      "go",
+      "javascript",
+      "python"
+    ],
+    "soft_skill_matches": [],
+    "soft_skill_missing": [
+      "innovation"
+    ],
+    "cert_matches": [],
+    "cert_missing": []
+  },
+  "action": "Skipped",
+  "status": "skipped",
+  "resume_file": "",
+  "resume_path": "",
+  "applied_at": "2026-04-11T10:47:35.150469",
+  "notes": "ATS score 55.8% below target 70% after 3 iterations"
+}

@@ -136,15 +136,27 @@ class JobTracker:
             encoding="utf-8",
         )
 
+    @staticmethod
+    def _action(r: dict) -> str:
+        """Derive action from record, handling old format gracefully."""
+        if "action" in r:
+            return r["action"]
+        status = r.get("status", "")
+        if status == "logged":
+            return "Applied"
+        if status == "error":
+            return "Error"
+        return "Skipped"
+
     def write_tracker_report(self, output_dir: str = "output") -> Path:
         """Generate a Markdown report of all tracked jobs."""
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
         report_path = out / "applied_jobs_report.md"
 
-        applied = [r for r in self._records if r["action"] == "Applied"]
-        skipped = [r for r in self._records if r["action"] == "Skipped"]
-        errors = [r for r in self._records if r["action"] == "Error"]
+        applied = [r for r in self._records if self._action(r) == "Applied"]
+        skipped = [r for r in self._records if self._action(r) == "Skipped"]
+        errors = [r for r in self._records if self._action(r) == "Error"]
 
         lines = [
             "# Job Application Tracker Report\n",
@@ -162,9 +174,9 @@ class JobTracker:
             lines.append("|---|----------|---------|----------|----------|-----------|------|-------------|-----|")
             for i, r in enumerate(applied, 1):
                 lines.append(
-                    f"| {i} | {r['job_code']} | {r['company']} | {r['position']} | "
-                    f"{r['platform']} | {r['ats_score']:.1f}% | {r['applied_date']} | "
-                    f"{r['resume_file']} | [Link]({r['url']}) |"
+                    f"| {i} | {r.get('job_code', 'NA')} | {r.get('company', '')} | {r.get('position', '')} | "
+                    f"{r.get('platform', '')} | {r.get('ats_score', 0):.1f}% | {r.get('applied_date', '')} | "
+                    f"{r.get('resume_file', r.get('resume_path', ''))} | [Link]({r.get('url', '')}) |"
                 )
             lines.append("")
 
@@ -173,9 +185,10 @@ class JobTracker:
             lines.append("| # | Job Code | Company | Position | Platform | ATS Score | Reason |")
             lines.append("|---|----------|---------|----------|----------|-----------|--------|")
             for i, r in enumerate(skipped, 1):
+                reason = r.get("reason", r.get("notes", ""))
                 lines.append(
-                    f"| {i} | {r['job_code']} | {r['company']} | {r['position']} | "
-                    f"{r['platform']} | {r['ats_score']:.1f}% | {r['reason'][:80]} |"
+                    f"| {i} | {r.get('job_code', 'NA')} | {r.get('company', '')} | {r.get('position', '')} | "
+                    f"{r.get('platform', '')} | {r.get('ats_score', 0):.1f}% | {reason[:80]} |"
                 )
             lines.append("")
 
@@ -184,8 +197,9 @@ class JobTracker:
             lines.append("| # | Company | Position | Error |")
             lines.append("|---|---------|----------|-------|")
             for i, r in enumerate(errors, 1):
+                reason = r.get("reason", r.get("notes", ""))
                 lines.append(
-                    f"| {i} | {r['company']} | {r['position']} | {r['reason'][:80]} |"
+                    f"| {i} | {r.get('company', '')} | {r.get('position', '')} | {reason[:80]} |"
                 )
             lines.append("")
 
@@ -221,4 +235,4 @@ class JobTracker:
 
     @property
     def total_logged(self) -> int:
-        return sum(1 for r in self._records if r["action"] == "Applied")
+        return sum(1 for r in self._records if self._action(r) == "Applied")
