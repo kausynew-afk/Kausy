@@ -24,10 +24,17 @@ class EmailReporter:
         self.config = config
         auto = config.get("automation", {})
         self._recipient = auto.get("email_recipient", "")
-        self._smtp_user = os.environ.get("SMTP_USER", os.environ.get("GMAIL_USER", ""))
-        self._smtp_pass = os.environ.get("SMTP_PASSWORD", os.environ.get("GMAIL_APP_PASSWORD", ""))
-        self._smtp_server = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
-        self._smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+        self._smtp_user = (
+            os.environ.get("SMTP_USER", "").strip()
+            or os.environ.get("GMAIL_USER", "").strip()
+        )
+        self._smtp_pass = (
+            os.environ.get("SMTP_PASSWORD", "").strip()
+            or os.environ.get("GMAIL_APP_PASSWORD", "").strip()
+        )
+        self._smtp_server = os.environ.get("SMTP_SERVER", "").strip() or "smtp.gmail.com"
+        raw_port = os.environ.get("SMTP_PORT", "").strip()
+        self._smtp_port = int(raw_port) if raw_port else 587
         self._output_dir = Path(config.get("logging", {}).get("output_directory", "output"))
 
     def send_report(
