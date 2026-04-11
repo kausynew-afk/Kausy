@@ -7,6 +7,8 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+artifact_output/
+artifact.zip
 
 # Ignore per-run logs (regenerated each run)
 data/logs/*.csv
