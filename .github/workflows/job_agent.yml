@@ -1,8 +1,8 @@
-name: Job Application Agent — Daily Run
+name: Job Application Agent — Manual Run
 
 on:
-  schedule:
-    - cron: "0 8 * * *"
+  # schedule:
+  #   - cron: "0 8 * * *"       # Uncomment to enable daily auto-run at 8 AM UTC
   workflow_dispatch:
 
 permissions:
