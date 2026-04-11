@@ -43,8 +43,21 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python main.py --config config.yaml
 
-      - name: Send email report
+      - name: Check if email report exists
+        id: check_report
         if: always()
+        run: |
+          if [ -f "output/email_report.html" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Email report file found"
+            ls -la output/*.pdf 2>/dev/null || echo "No PDF files found"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No email report file found"
+          fi
+
+      - name: Send email report
+        if: always() && steps.check_report.outputs.exists == 'true'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -55,7 +68,7 @@ jobs:
           from: ${{ secrets.GMAIL_USER }}
           subject: "Job Agent Report — ${{ github.run_id }}"
           html_body: file://output/email_report.html
-          attachments: output/*.md
+          attachments: output/*.pdf
         continue-on-error: true
 
       - name: Upload run artifacts

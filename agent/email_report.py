@@ -97,14 +97,31 @@ class EmailReporter:
                 continue
             try:
                 data = path.read_bytes()
-                part = MIMEApplication(data, Name=rec.resume_filename or path.name)
-                part["Content-Disposition"] = (
-                    f'attachment; filename="{rec.resume_filename or path.name}"'
-                )
+                fname = rec.resume_filename or path.name
+                subtype = "pdf" if path.suffix.lower() == ".pdf" else "octet-stream"
+                part = MIMEApplication(data, _subtype=subtype, Name=fname)
+                part["Content-Disposition"] = f'attachment; filename="{fname}"'
                 msg.attach(part)
                 attached += 1
             except Exception as e:
                 logger.warning("Could not attach %s: %s", path, e)
+
+        # Also attach any PDF files in output/ that weren't in records
+        for pdf in self._output_dir.glob("*.pdf"):
+            already = any(
+                Path(r.resume_path).name == pdf.name
+                for r in records if r.resume_path
+            )
+            if already:
+                continue
+            try:
+                data = pdf.read_bytes()
+                part = MIMEApplication(data, _subtype="pdf", Name=pdf.name)
+                part["Content-Disposition"] = f'attachment; filename="{pdf.name}"'
+                msg.attach(part)
+                attached += 1
+            except Exception as e:
+                logger.warning("Could not attach extra PDF %s: %s", pdf, e)
 
         logger.info("Email: attached %d tailored resume(s)", attached)
 
@@ -201,7 +218,7 @@ class EmailReporter:
     {"" if not applied else f'''
     <div class="section">
         <h2>Applied Jobs ({len(applied)})</h2>
-        <p>Tailored resumes are attached to this email.</p>
+        <p>Tailored PDF resumes are attached to this email.</p>
         <table>
             <tr><th>#</th><th>Code</th><th>Company</th><th>Position</th><th>Platform</th><th>Location</th><th>ATS</th><th>Link</th><th>Resume</th></tr>
             {applied_rows}

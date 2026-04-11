@@ -47,11 +47,11 @@ class JobListing:
 
     @property
     def resume_filename(self) -> str:
-        """JobCode_CompanyName_Designation_Date.md"""
+        """JobCode_CompanyName_Designation_Date.pdf"""
         code = self.job_code or "NA"
         code_clean = re.sub(r"[^a-zA-Z0-9_-]", "", code)
         date_str = datetime.now().strftime("%Y-%m-%d")
-        return f"{code_clean}_{self.safe_company}_{self.safe_title}_{date_str}.md"
+        return f"{code_clean}_{self.safe_company}_{self.safe_title}_{date_str}.pdf"
 
     @staticmethod
     def _normalize(text: str) -> str:

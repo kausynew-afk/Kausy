@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from ..models import ATSResult, ApplicationRecord, JobListing
+from ..pdf_converter import md_to_pdf
 
 logger = logging.getLogger(__name__)
 
@@ -108,9 +109,15 @@ class AuditLogger:
         return self._records
 
     def _save_resume(self, job: JobListing, resume_md: str, filename: str) -> str:
-        path = self._out_dir / filename
-        path.write_text(resume_md, encoding="utf-8")
-        return str(path)
+        pdf_path = self._out_dir / filename
+        try:
+            md_to_pdf(resume_md, pdf_path)
+        except Exception as e:
+            logger.error("PDF conversion failed for %s: %s — saving as .md fallback", filename, e)
+            fallback = pdf_path.with_suffix(".md")
+            fallback.write_text(resume_md, encoding="utf-8")
+            return str(fallback)
+        return str(pdf_path)
 
     def _append_to_csv(self, record: ApplicationRecord) -> None:
         csv_path = self._log_dir / f"applications_{self._run_id}.csv"
