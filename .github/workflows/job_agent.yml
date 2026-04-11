@@ -28,6 +28,12 @@ jobs:
           mkdir -p data/logs
           mkdir -p output
 
+      - name: Install system fonts for PDF rendering
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-dejavu-core >/dev/null 2>&1
+          fc-cache -f
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
@@ -39,17 +45,22 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python main.py --config config.yaml
 
-      - name: Check if email report exists
+      - name: List generated PDFs and report
         id: check_report
         if: always()
         run: |
+          echo "=== Output folder contents ==="
+          ls -la output/ 2>/dev/null || echo "output/ folder not found"
+          echo ""
+          echo "=== PDF files ==="
+          ls -la output/*.pdf 2>/dev/null || echo "No PDF files generated"
+          echo ""
           if [ -f "output/email_report.html" ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Email report file found"
-            ls -la output/*.pdf 2>/dev/null || echo "No PDF files found"
+            echo "Email HTML report: FOUND"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "No email report file found"
+            echo "Email HTML report: NOT FOUND"
           fi
 
       - name: Send email report
