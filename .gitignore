@@ -22,6 +22,8 @@ data/logs/detail_*.json
 # Ignore per-run output (uploaded as artifacts)
 output/run_summary_*.md
 output/resume_*.md
+output/*.pdf
+output/email_report.html
 
 # Keep the tracker report (committed back)
 !output/applied_jobs_report.md
