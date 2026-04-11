@@ -12,6 +12,7 @@ from .models import JobListing
 from .resume import ResumeModifier
 from .safety import DeduplicationGuard, RateLimiter
 from .scrapers import IndeedScraper, LinkedInScraper, NaukriScraper
+from .tracker import JobTracker
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ class Orchestrator:
         self.dedup = DeduplicationGuard(config)
         self.limiter = RateLimiter(config)
         self.audit = AuditLogger(config)
+        self.tracker = JobTracker(config)
 
         self._target_score = config.get("ats", {}).get("target_score", 80)
         self._max_iterations = config.get("ats", {}).get("max_iterations", 3)
@@ -77,11 +79,19 @@ class Orchestrator:
                     f"target {self._target_score}% after {final_ats.iteration} iterations"
                 )
 
-            self.audit.log_application(
+            record = self.audit.log_application(
                 job=job,
                 ats=final_ats,
                 tailored_resume=tailored_resume,
                 status=status,
+                notes=notes,
+            )
+
+            self.tracker.track(
+                job=job,
+                ats=final_ats,
+                status=status,
+                resume_path=record.resume_path,
                 notes=notes,
             )
 
@@ -90,8 +100,13 @@ class Orchestrator:
             processed += 1
 
         summary_path = self.audit.write_summary()
+        tracker_path = self.tracker.write_tracker_report()
         logger.info("Run complete. Summary: %s", summary_path)
-        logger.info("Processed %d jobs, %d remaining in rate limit", processed, self.limiter.remaining)
+        logger.info("Applied jobs tracker: %s", tracker_path)
+        logger.info(
+            "Processed %d jobs | Tracker total: %d (logged: %d) | Rate limit remaining: %d",
+            processed, self.tracker.total_tracked, self.tracker.total_logged, self.limiter.remaining,
+        )
 
     def _tailor_with_iteration(
         self, master_text: str, job: JobListing

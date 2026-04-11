@@ -20,7 +20,7 @@ scraping:
   posted_within_days: 7
 
 ats:
-  target_score: 90                   # minimum ATS match % before accepting
+  target_score: 70                   # minimum ATS match % before accepting
   max_iterations: 3                  # max resume re-tailoring attempts
   keyword_weights:
     technical_skills: 0.45

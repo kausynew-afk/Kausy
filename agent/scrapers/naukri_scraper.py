@@ -1,4 +1,4 @@
-"""Naukri.com job scraper using Playwright."""
+"""Naukri.com (www.naukri.com) job scraper using Playwright."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ NAUKRI_JOB_TYPE = {
 
 
 class NaukriScraper(BaseScraper):
-    """Scrapes Naukri.com public job search results (India's largest job portal)."""
+    """Scrapes www.naukri.com public job search results."""
 
     @property
     def platform_name(self) -> str:
@@ -97,15 +97,31 @@ class NaukriScraper(BaseScraper):
 
             await self._throttle()
 
-            # Scroll to trigger lazy-loaded cards
-            for _ in range(3):
+            # Scroll multiple times to trigger lazy-loaded content
+            for _ in range(5):
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                await page.wait_for_timeout(1500)
+                await page.wait_for_timeout(2000)
 
+            # Naukri uses multiple card structures across redesigns
             job_cards = await page.query_selector_all(
-                "article.jobTuple, div.srp-jobtuple-wrapper, div.cust-job-tuple, "
-                "div[class*='jobTuple'], div[data-job-id]"
+                "article.jobTuple, "
+                "div.srp-jobtuple-wrapper, "
+                "div.cust-job-tuple, "
+                "div[class*='jobTuple'], "
+                "div[data-job-id], "
+                "div.list > div.row, "
+                "div[class*='cardContainer'], "
+                "a[class*='cardContainer'], "
+                "div[class*='JobInfoCard'], "
+                "div[class*='job-card']"
             )
+
+            if not job_cards:
+                # Fallback: try to find any anchor elements with job links
+                job_cards = await page.query_selector_all(
+                    "a[href*='/job-listings-'], "
+                    "a[href*='naukri.com/job-listings']"
+                )
 
             if not job_cards:
                 logger.info("Naukri: no cards found on page %d, stopping", page_num)
@@ -129,23 +145,44 @@ class NaukriScraper(BaseScraper):
 
     async def _parse_card(self, card: Any, page: Page) -> JobListing | None:
         title_el = await card.query_selector(
-            "a.title, a[class*='title'], h2 a, a[class*='jobTitle']"
+            "a.title, "
+            "a[class*='title'], "
+            "h2 a, "
+            "a[class*='jobTitle'], "
+            "a[class*='designationLink'], "
+            "a[class*='info-desc']"
         )
         company_el = await card.query_selector(
-            "a.subTitle, a[class*='companyName'], span[class*='companyName'], "
-            "a.comp-name, span.comp-name"
+            "a.subTitle, "
+            "a[class*='companyName'], "
+            "span[class*='companyName'], "
+            "a.comp-name, "
+            "span.comp-name, "
+            "a[class*='companyInfo'], "
+            "span[class*='comp-dtls-wrap']"
         )
         location_el = await card.query_selector(
-            "span.locWdth, span[class*='location'], li.location, "
-            "span[class*='loc'], span.loc"
+            "span.locWdth, "
+            "span[class*='location'], "
+            "li.location, "
+            "span[class*='loc'], "
+            "span.loc, "
+            "span[class*='locn'], "
+            "span[class*='ellipsis loc']"
         )
         exp_el = await card.query_selector(
-            "span.expwdth, span[class*='experience'], li.experience, "
-            "span[class*='exp']"
+            "span.expwdth, "
+            "span[class*='experience'], "
+            "li.experience, "
+            "span[class*='exp'], "
+            "span[class*='expwdth']"
         )
         salary_el = await card.query_selector(
-            "span.sal, span[class*='salary'], li.salary, "
-            "span[class*='sal']"
+            "span.sal, "
+            "span[class*='salary'], "
+            "li.salary, "
+            "span[class*='sal'], "
+            "span[class*='salaryText']"
         )
 
         title = (await title_el.inner_text()).strip() if title_el else None
@@ -155,6 +192,10 @@ class NaukriScraper(BaseScraper):
         salary = (await salary_el.inner_text()).strip() if salary_el else None
 
         href = await title_el.get_attribute("href") if title_el else None
+
+        if not href and title_el:
+            parent = await card.query_selector("a[href]")
+            href = await parent.get_attribute("href") if parent else None
 
         if not title or not company or not href:
             return None
@@ -182,26 +223,40 @@ class NaukriScraper(BaseScraper):
             await detail_page.goto(url, wait_until="domcontentloaded", timeout=20000)
             await self._throttle()
 
+            # Wait for JD content to render
+            await detail_page.wait_for_timeout(2000)
+
             desc_el = await detail_page.query_selector(
-                "div.job-desc, div[class*='job-desc'], div[class*='jobDesc'], "
-                "section.job-desc, div.dang-inner-html, "
-                "div[class*='description'], section[class*='JobDescription']"
+                "div.job-desc, "
+                "div[class*='job-desc'], "
+                "div[class*='jobDesc'], "
+                "section.job-desc, "
+                "div.dang-inner-html, "
+                "div[class*='description'], "
+                "section[class*='JobDescription'], "
+                "div[class*='styles_JDC__'], "
+                "div[class*='jd-desc']"
             )
 
             if not desc_el:
                 desc_el = await detail_page.query_selector(
-                    "div[class*='jd-container'], div[class*='about-company'], "
-                    "div.other-details"
+                    "div[class*='jd-container'], "
+                    "div[class*='about-company'], "
+                    "div.other-details, "
+                    "section[class*='styles_job-desc']"
                 )
 
             description = ""
             if desc_el:
                 description = (await desc_el.inner_text()).strip()
 
-            # Also grab key skills if available
             skills_el = await detail_page.query_selector(
-                "div.key-skill, div[class*='keySkill'], div[class*='chip-container'], "
-                "div[class*='tags-gt']"
+                "div.key-skill, "
+                "div[class*='keySkill'], "
+                "div[class*='chip-container'], "
+                "div[class*='tags-gt'], "
+                "div[class*='styles_key-skill'], "
+                "section[class*='KeySkill']"
             )
             if skills_el:
                 skills_text = (await skills_el.inner_text()).strip()

@@ -40,6 +40,12 @@ class DeduplicationGuard:
         self._seen.add(job.uid)
         self._persist()
 
+    def clear(self) -> None:
+        """Reset the dedup database."""
+        self._seen.clear()
+        self._persist()
+        logger.info("Dedup database cleared")
+
     def _persist(self) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         payload = {"applied_uids": sorted(self._seen)}
