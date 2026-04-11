@@ -146,25 +146,34 @@ class Orchestrator:
         tailored_resume, final_ats = self._tailor_with_iteration(master_text, job)
 
         if final_ats.overall_score < self._target_score:
-            status = "skipped"
             notes = (
                 f"ATS score {final_ats.overall_score:.1f}% below "
                 f"target {self._target_score}% after {final_ats.iteration} iterations"
             )
             logger.info(
-                "SKIPPED (low ATS): %s @ %s — %s",
+                "LOW ATS: %s @ %s — %s (still emailing with resume)",
                 job.title, job.company, notes,
             )
 
-            self.audit.log_application(
+            record = self.audit.log_application(
                 job=job, ats=final_ats,
                 tailored_resume=tailored_resume,
-                status=status, notes=notes,
+                status="skipped", notes=notes,
             )
+
+            email_ok = self.emailer.send_job_email(
+                job=job, ats=final_ats,
+                resume_path=record.resume_path,
+                resume_filename=record.resume_filename,
+                skip_reason=notes,
+            )
+
             self.tracker.track(
-                job=job, ats=final_ats, status=status,
-                resume_path="", resume_filename="",
-                action="Skipped", notes=notes,
+                job=job, ats=final_ats, status="skipped",
+                resume_path=record.resume_path,
+                resume_filename=record.resume_filename,
+                action="Skipped (Emailed)" if email_ok else "Skipped",
+                notes=notes,
             )
             self.dedup.mark_applied(job)
             self.limiter.record()

@@ -57,9 +57,12 @@ class EmailReporter:
         ats: ATSResult,
         resume_path: str,
         resume_filename: str,
+        skip_reason: str = "",
     ) -> bool:
         """Send ONE email for ONE job with the tailored PDF resume attached.
 
+        If skip_reason is provided, the email indicates the job was skipped
+        but still includes the apply link and resume for manual review.
         Returns True if the email was sent successfully.
         """
         if not self.can_send:
@@ -69,9 +72,12 @@ class EmailReporter:
             )
             return False
 
-        subject = f"New Job Ready for Application - {job.company} - {job.title}"
+        if skip_reason:
+            subject = f"[Low Match] {job.company} - {job.title} (ATS {ats.overall_score:.0f}%)"
+        else:
+            subject = f"New Job Ready for Application - {job.company} - {job.title}"
 
-        html = self._render_job_html(job, ats, resume_filename)
+        html = self._render_job_html(job, ats, resume_filename, skip_reason)
 
         msg = MIMEMultipart("mixed")
         msg["From"] = self._smtp_user
@@ -99,7 +105,8 @@ class EmailReporter:
                 server.send_message(msg)
             self._emails_sent += 1
             logger.info(
-                "EMAIL SENT: %s @ %s -> %s (resume: %s)",
+                "EMAIL SENT (%s): %s @ %s -> %s (resume: %s)",
+                "skipped" if skip_reason else "matched",
                 job.title, job.company, self._recipient, resume_filename,
             )
             return True
@@ -157,7 +164,8 @@ class EmailReporter:
     # ── HTML renderers ────────────────────────────────────────────────────
 
     def _render_job_html(
-        self, job: JobListing, ats: ATSResult, resume_filename: str
+        self, job: JobListing, ats: ATSResult, resume_filename: str,
+        skip_reason: str = "",
     ) -> str:
         """Styled HTML body for a single-job email."""
         code = job.job_code or "NA"
@@ -166,6 +174,19 @@ class EmailReporter:
         matched = ", ".join(ats.technical_matches[:10]) or "N/A"
         missing = ", ".join(ats.technical_missing[:10]) or "None"
 
+        if skip_reason:
+            banner_bg = "linear-gradient(135deg, #e65100, #ff9800)"
+            banner_title = "Job Found - Low ATS Match (Review Manually)"
+            status_badge = (
+                f'<div style="margin-top:12px;padding:8px 14px;background:#fff3e0;'
+                f'border-left:4px solid #e65100;border-radius:4px;font-size:13px;color:#bf360c;">'
+                f'<strong>Skipped Reason:</strong> {skip_reason}</div>'
+            )
+        else:
+            banner_bg = "linear-gradient(135deg, #1a73e8, #4285f4)"
+            banner_title = "New Job Ready for Application"
+            status_badge = ""
+
         return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -173,7 +194,7 @@ class EmailReporter:
     body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }}
     .card {{ max-width: 680px; margin: 0 auto; background: white; border-radius: 10px;
              overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }}
-    .banner {{ background: linear-gradient(135deg, #1a73e8, #4285f4); color: white; padding: 24px 28px; }}
+    .banner {{ background: {banner_bg}; color: white; padding: 24px 28px; }}
     .banner h1 {{ margin: 0; font-size: 20px; }}
     .banner p {{ margin: 6px 0 0; opacity: 0.9; font-size: 13px; }}
     .body {{ padding: 24px 28px; color: #333; }}
@@ -197,10 +218,11 @@ class EmailReporter:
 <body>
 <div class="card">
     <div class="banner">
-        <h1>New Job Ready for Application</h1>
+        <h1>{banner_title}</h1>
         <p>{date_str}</p>
     </div>
     <div class="body">
+        {status_badge}
         <div class="field">
             <div class="label">Company</div>
             <div class="value"><strong>{job.company}</strong></div>
@@ -292,7 +314,9 @@ class EmailReporter:
                 <td>{r.job.title}</td>
                 <td>{r.job.platform}</td>
                 <td>{r.ats_score:.1f}%</td>
-                <td>{r.notes[:80]}</td>
+                <td><a href="{r.job.url}">Apply</a></td>
+                <td>{r.resume_filename or 'N/A'}</td>
+                <td>{r.notes[:60]}</td>
             </tr>"""
 
         error_rows = ""
@@ -358,9 +382,10 @@ class EmailReporter:
     </div>'''}
     {"" if not skipped else f'''
     <div class="section">
-        <h2>Skipped Jobs ({len(skipped)})</h2>
+        <h2>Skipped Jobs ({len(skipped)}) - Low ATS Match</h2>
+        <p>These jobs had low ATS scores but resumes and apply links are included for manual review.</p>
         <table>
-            <tr><th>#</th><th>Code</th><th>Company</th><th>Position</th><th>Platform</th><th>ATS</th><th>Reason</th></tr>
+            <tr><th>#</th><th>Code</th><th>Company</th><th>Position</th><th>Platform</th><th>ATS</th><th>Link</th><th>Resume</th><th>Reason</th></tr>
             {skipped_rows}
         </table>
     </div>'''}
@@ -386,7 +411,7 @@ class EmailReporter:
         """Attach all PDF resumes from the current run to the summary email."""
         attached = 0
         for rec in records:
-            if rec.status != "email_sent" or not rec.resume_path:
+            if not rec.resume_path:
                 continue
             path = Path(rec.resume_path)
             if not path.exists():

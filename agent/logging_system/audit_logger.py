@@ -39,7 +39,7 @@ class AuditLogger:
     ) -> ApplicationRecord:
         resume_path = ""
         resume_filename = ""
-        if self._save_resumes and status != "skipped":
+        if self._save_resumes:
             resume_filename = job.resume_filename
             resume_path = self._save_resume(job, tailored_resume, resume_filename)
 
