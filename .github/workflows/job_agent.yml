@@ -62,7 +62,7 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           to: kausynew@gmail.com
           from: ${{ secrets.GMAIL_USER }}
-          subject: "Job Agent Report — ${{ github.run_id }}"
+          subject: "Job Agent Daily Summary — ${{ github.run_id }}"
           html_body: file://output/email_report.html
           attachments: output/*.pdf
         continue-on-error: true

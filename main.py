@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 from agent.config_loader import load_config
-from agent.email_report import EmailReporter
 from agent.orchestrator import Orchestrator
 
 
@@ -30,13 +29,13 @@ def setup_logging(level: str = "INFO") -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Autonomous Job Application Agent",
+        description="Job Application Agent — finds jobs, tailors resumes, emails you",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 Examples:
   python main.py                           # Run with default config.yaml
   python main.py --config my_config.yaml   # Use a custom config
-  python main.py --dry-run                 # Scrape and analyse only, don't log applications
+  python main.py --dry-run                 # Scrape and analyse only, no emails sent
   python main.py --verbose                 # Enable debug-level logging
         """,
     )
@@ -46,7 +45,7 @@ Examples:
     )
     parser.add_argument(
         "--dry-run", action="store_true",
-        help="Scrape and score only — no applications logged",
+        help="Scrape and score only — no emails sent",
     )
     parser.add_argument(
         "--verbose", action="store_true",
@@ -65,20 +64,19 @@ Examples:
 
     if args.dry_run:
         config.setdefault("safety", {})["max_applications_per_run"] = 0
-        logger.info("DRY RUN mode — no applications will be logged")
+        logger.info("DRY RUN mode — no jobs will be processed")
 
     orchestrator = Orchestrator(config)
     run_result = asyncio.run(orchestrator.run())
 
     try:
-        emailer = EmailReporter(config)
-        emailer.send_report(
+        orchestrator.emailer.send_summary_report(
             records=run_result["records"],
             run_id=run_result["run_id"],
             stats=run_result,
         )
     except Exception as e:
-        logger.warning("Email report failed (non-fatal): %s", e)
+        logger.warning("Summary email failed (non-fatal): %s", e)
 
 
 if __name__ == "__main__":

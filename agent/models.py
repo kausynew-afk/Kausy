@@ -79,5 +79,5 @@ class ApplicationRecord:
     resume_path: str
     resume_filename: str = ""
     applied_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    status: str = "logged"  # logged | applied | skipped | error
+    status: str = "email_sent"  # email_sent | skipped | error
     notes: str = ""

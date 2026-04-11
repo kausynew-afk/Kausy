@@ -82,7 +82,7 @@ class AuditLogger:
             )
 
         lines.append("")
-        applied = sum(1 for r in self._records if r.status == "logged")
+        applied = sum(1 for r in self._records if r.status in ("logged", "email_sent"))
         skipped = sum(1 for r in self._records if r.status == "skipped")
         errors = sum(1 for r in self._records if r.status == "error")
         avg_score = (
@@ -90,7 +90,7 @@ class AuditLogger:
             if self._records else 0
         )
         lines.extend([
-            f"**Applied/Logged:** {applied}  ",
+            f"**Emailed:** {applied}  ",
             f"**Skipped (duplicate/low-score):** {skipped}  ",
             f"**Errors:** {errors}  ",
             f"**Average ATS Score:** {avg_score:.1f}%  ",
@@ -140,7 +140,7 @@ class AuditLogger:
                 record.job.location,
                 record.ats_score,
                 record.status,
-                "Applied" if record.status == "logged" else "Skipped",
+                "Email Sent" if record.status in ("logged", "email_sent") else "Skipped",
                 record.job.url,
                 record.resume_filename,
                 record.notes,
@@ -167,7 +167,7 @@ class AuditLogger:
                 "cert_matches": ats.cert_matches,
                 "cert_missing": ats.cert_missing,
             },
-            "action": "Applied" if record.status == "logged" else "Skipped",
+            "action": "Email Sent" if record.status in ("logged", "email_sent") else "Skipped",
             "status": record.status,
             "resume_file": record.resume_filename,
             "resume_path": record.resume_path,

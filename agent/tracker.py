@@ -56,7 +56,7 @@ class JobTracker:
             "salary": job.salary or "Not disclosed",
             "ats_score": ats.overall_score,
             "status": status,
-            "action": action or ("Applied" if status == "logged" else "Skipped"),
+            "action": action or ("Email Sent" if status == "email_sent" else "Skipped"),
             "reason": notes if status != "logged" else "",
             "applied_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "resume_file": resume_filename,
@@ -142,8 +142,8 @@ class JobTracker:
         if "action" in r:
             return r["action"]
         status = r.get("status", "")
-        if status == "logged":
-            return "Applied"
+        if status in ("logged", "email_sent"):
+            return "Email Sent"
         if status == "error":
             return "Error"
         return "Skipped"
@@ -154,14 +154,14 @@ class JobTracker:
         out.mkdir(parents=True, exist_ok=True)
         report_path = out / "applied_jobs_report.md"
 
-        applied = [r for r in self._records if self._action(r) == "Applied"]
+        applied = [r for r in self._records if self._action(r) in ("Applied", "Email Sent", "Email Failed (PDF Saved)")]
         skipped = [r for r in self._records if self._action(r) == "Skipped"]
         errors = [r for r in self._records if self._action(r) == "Error"]
 
         lines = [
             "# Job Application Tracker Report\n",
             f"**Total jobs processed:** {len(self._records)}  ",
-            f"**Applied:** {len(applied)}  ",
+            f"**Emailed / Processed:** {len(applied)}  ",
             f"**Skipped:** {len(skipped)}  ",
             f"**Errors:** {len(errors)}  ",
             f"**Last updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n",
@@ -169,7 +169,7 @@ class JobTracker:
         ]
 
         if applied:
-            lines.append("## Applied Jobs\n")
+            lines.append("## Emailed Jobs (Ready to Apply)\n")
             lines.append("| # | Job Code | Company | Position | Platform | ATS Score | Date | Resume File | URL |")
             lines.append("|---|----------|---------|----------|----------|-----------|------|-------------|-----|")
             for i, r in enumerate(applied, 1):
@@ -235,4 +235,4 @@ class JobTracker:
 
     @property
     def total_logged(self) -> int:
-        return sum(1 for r in self._records if self._action(r) == "Applied")
+        return sum(1 for r in self._records if self._action(r) in ("Applied", "Email Sent", "Email Failed (PDF Saved)"))

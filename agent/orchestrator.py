@@ -1,10 +1,12 @@
-"""Main orchestrator -- wires scraping, analysis, tailoring, and logging.
+"""Main orchestrator -- wires scraping, analysis, tailoring, email, and logging.
 
 Strict rules enforced:
-  1. No duplicate applications (company+title, job code, UID triple-check)
-  2. Resume customized for every job before logging
-  3. Resume saved with standardized naming before marking applied
-  4. Fail-safe: errors on one job never crash the whole run
+  1. No duplicate jobs (company+title, job code, UID triple-check)
+  2. Resume customized for every job before proceeding
+  3. Resume saved as PDF with standardized naming
+  4. Email the user per job -- agent does NOT auto-apply
+  5. Validate everything before sending email
+  6. Fail-safe: errors on one job never crash the whole run
 """
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ import traceback
 from typing import Any
 
 from .analysis import ATSAnalyzer
+from .email_report import EmailReporter
 from .logging_system import AuditLogger
 from .models import JobListing
 from .resume import ResumeModifier
@@ -32,7 +35,7 @@ PLATFORM_MAP = {
 
 
 class Orchestrator:
-    """Runs the full pipeline: scrape -> analyse -> tailor -> validate -> log."""
+    """Runs the full pipeline: scrape -> analyse -> tailor -> validate -> email."""
 
     def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
@@ -42,6 +45,7 @@ class Orchestrator:
         self.limiter = RateLimiter(config)
         self.audit = AuditLogger(config)
         self.tracker = JobTracker(config)
+        self.emailer = EmailReporter(config)
 
         self._target_score = config.get("ats", {}).get("target_score", 80)
         self._max_iterations = config.get("ats", {}).get("max_iterations", 3)
@@ -58,7 +62,7 @@ class Orchestrator:
         logger.info("Total listings scraped: %d", len(listings))
 
         processed = 0
-        applied_count = 0
+        email_sent_count = 0
         skipped_count = 0
         error_count = 0
 
@@ -70,8 +74,8 @@ class Orchestrator:
             try:
                 result = self._process_single_job(master_text, job)
                 processed += 1
-                if result == "logged":
-                    applied_count += 1
+                if result == "email_sent":
+                    email_sent_count += 1
                 elif result == "skipped":
                     skipped_count += 1
                 elif result == "error":
@@ -93,7 +97,7 @@ class Orchestrator:
         logger.info("  Summary report : %s", summary_path)
         logger.info("  Tracker report : %s", tracker_path)
         logger.info("  Total processed: %d", processed)
-        logger.info("  Applied/Logged : %d", applied_count)
+        logger.info("  Emails sent    : %d", email_sent_count)
         logger.info("  Skipped        : %d", skipped_count)
         logger.info("  Errors         : %d", error_count)
         logger.info("  Rate remaining : %d", self.limiter.remaining)
@@ -101,7 +105,7 @@ class Orchestrator:
 
         return {
             "processed": processed,
-            "applied": applied_count,
+            "email_sent_count": email_sent_count,
             "skipped": skipped_count,
             "errors": error_count,
             "summary_path": str(summary_path),
@@ -121,7 +125,7 @@ class Orchestrator:
                 job.title, job.company, dup_reason,
             )
             self.tracker.track_skip(
-                job, reason=f"Skipped – Already Applied ({dup_reason})"
+                job, reason=f"Skipped - Already Processed ({dup_reason})"
             )
             return "skipped"
 
@@ -130,7 +134,7 @@ class Orchestrator:
             logger.warning(
                 "SKIPPED (empty JD): %s @ %s", job.title, job.company,
             )
-            self.tracker.track_skip(job, reason="Skipped – Empty Job Description")
+            self.tracker.track_skip(job, reason="Skipped - Empty Job Description")
             return "skipped"
 
         logger.info(
@@ -152,7 +156,7 @@ class Orchestrator:
                 job.title, job.company, notes,
             )
 
-            record = self.audit.log_application(
+            self.audit.log_application(
                 job=job, ats=final_ats,
                 tailored_resume=tailored_resume,
                 status=status, notes=notes,
@@ -166,39 +170,55 @@ class Orchestrator:
             self.limiter.record()
             return "skipped"
 
-        # --- RULE 3: Save resume with standard naming ---
+        # --- RULE 3: Save resume as PDF with standard naming ---
         record = self.audit.log_application(
             job=job, ats=final_ats,
             tailored_resume=tailored_resume,
-            status="logged", notes="",
+            status="email_sent", notes="",
         )
 
-        # --- RULE 4: Validate before marking applied ---
+        # --- RULE 5: Validate before sending email ---
         if not record.resume_path:
             logger.error(
                 "VALIDATION FAILED: resume not saved for %s @ %s, aborting",
                 job.title, job.company,
             )
             self.tracker.track_error(
-                job, "Resume file was not saved — application aborted"
+                job, "Resume PDF was not generated - email not sent"
             )
             return "error"
 
-        self.tracker.track(
-            job=job, ats=final_ats, status="logged",
+        if not job.url or not job.url.startswith("http"):
+            logger.warning(
+                "VALIDATION: invalid job URL for %s @ %s — sending email anyway",
+                job.title, job.company,
+            )
+
+        # --- RULE 4: Email the user instead of applying ---
+        email_ok = self.emailer.send_job_email(
+            job=job,
+            ats=final_ats,
             resume_path=record.resume_path,
             resume_filename=record.resume_filename,
-            action="Applied", notes="",
+        )
+
+        action = "Email Sent" if email_ok else "Email Failed (PDF Saved)"
+
+        self.tracker.track(
+            job=job, ats=final_ats, status="email_sent",
+            resume_path=record.resume_path,
+            resume_filename=record.resume_filename,
+            action=action, notes="",
         )
         self.dedup.mark_applied(job)
         self.limiter.record()
 
         logger.info(
-            "APPLIED: %s @ %s — ATS %.1f%% — Resume: %s",
-            job.title, job.company, final_ats.overall_score,
-            record.resume_filename,
+            "%s: %s @ %s — ATS %.1f%% — Resume: %s",
+            action.upper(), job.title, job.company,
+            final_ats.overall_score, record.resume_filename,
         )
-        return "logged"
+        return "email_sent"
 
     def _tailor_with_iteration(
         self, master_text: str, job: JobListing
