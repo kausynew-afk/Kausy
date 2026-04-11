@@ -23,14 +23,17 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
+      - name: Create required directories
+        run: |
+          mkdir -p data/logs
+          mkdir -p output
+
       - name: Install dependencies
-        working-directory: ./Agent/Job
         run: |
           pip install -r requirements.txt
           playwright install chromium --with-deps
 
       - name: Run agent
-        working-directory: ./Agent/Job
         run: python main.py --config config.yaml
 
       - name: Upload run artifacts
@@ -39,15 +42,15 @@ jobs:
         with:
           name: agent-run-${{ github.run_id }}
           path: |
-            Agent/Job/output/
-            Agent/Job/data/logs/
+            output/
+            data/logs/
           retention-days: 30
 
-      - name: Commit updated dedup database
-        if: success()
+      - name: Commit updated dedup and tracker
+        if: always()
         run: |
           git config user.name "Job Agent Bot"
           git config user.email "bot@noreply.github.com"
-          git add Agent/Job/data/logs/applied_jobs.json
-          git diff --cached --quiet || git commit -m "chore: update applied-jobs ledger [skip ci]"
-          git push
+          git add -f data/logs/applied_jobs.json data/logs/tracked_applications.json output/applied_jobs_report.md || true
+          git diff --cached --quiet || git commit -m "chore: update job tracker and dedup ledger [skip ci]"
+          git push || true

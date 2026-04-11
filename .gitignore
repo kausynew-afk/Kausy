@@ -2,13 +2,24 @@ __pycache__/
 *.pyc
 *.pyo
 .env
-data/logs/*.csv
-data/logs/*.json
-data/logs/*.log
-output/*.md
-output/*.json
 .vscode/
 .idea/
 *.egg-info/
 dist/
 build/
+
+# Ignore per-run logs (regenerated each run)
+data/logs/*.csv
+data/logs/*.log
+data/logs/detail_*.json
+
+# Keep these persistent files (tracked by git)
+!data/logs/applied_jobs.json
+!data/logs/tracked_applications.json
+
+# Ignore per-run output (uploaded as artifacts)
+output/run_summary_*.md
+output/resume_*.md
+
+# Keep the tracker report (committed back)
+!output/applied_jobs_report.md
