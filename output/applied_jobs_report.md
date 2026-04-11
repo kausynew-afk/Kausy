@@ -1,10 +1,10 @@
 # Job Application Tracker Report
 
-**Total jobs processed:** 195  
-**Emailed / Processed:** 22  
-**Skipped:** 173  
+**Total jobs processed:** 216  
+**Emailed / Processed:** 30  
+**Skipped:** 174  
 **Errors:** 0  
-**Last updated:** 2026-04-11 13:49:46
+**Last updated:** 2026-04-11 14:03:37
 
 ---
 
@@ -34,6 +34,14 @@
 | 20 | LI-4387766579 | Bajaj Finserv | Software Engineer | linkedin | 76.4% | 2026-04-11 13:29 | LI-4387766579_BajajFinserv_SoftwareEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/software-engineer-at-bajaj-finserv-4387766579) |
 | 21 | LI-4394788543 | Neev | BIM Engineer- Mechanical & Plumbing IV | linkedin | 93.3% | 2026-04-11 13:29 | LI-4394788543_Neev_BIMEngineerMechanicalPlumbingIV_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/bim-engineer-mechanical-plumbing-iv-at-neev-4394788543) |
 | 22 | LI-4395972145 | Globex Digital | Platform Validation Engineer | linkedin | 71.7% | 2026-04-11 13:49 | LI-4395972145_GlobexDigital_PlatformValidationEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/platform-validation-engineer-at-globex-digital-4395972145) |
+| 23 | LI-4393561606 | Tata Consultancy Services | Test Engineer | linkedin | 100.0% | 2026-04-11 14:03 | LI-4393561606_TataConsultancyServices_TestEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/test-engineer-at-tata-consultancy-services-4393561606) |
+| 24 | LI-4079934536 | Williams-Sonoma, Inc. | Automation Engineer | linkedin | 75.5% | 2026-04-11 14:03 | LI-4079934536_WilliamsSonomaInc_AutomationEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/automation-engineer-at-williams-sonoma-inc-4079934536) |
+| 25 | LI-4396756712 | Barclays | Test Engineer | linkedin | 75.6% | 2026-04-11 14:03 | LI-4396756712_Barclays_TestEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/test-engineer-at-barclays-4396756712) |
+| 26 | LI-4384036787 | EPAM Systems | Software Engineer – Salesforce Testing | linkedin | 73.5% | 2026-04-11 14:03 | LI-4384036787_EPAMSystems_SoftwareEngineerSalesforceTesting_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/software-engineer-%E2%80%93-salesforce-testing-at-epam-systems-4384036787) |
+| 27 | LI-4398851818 | Barclays | Automation Test Engineer - BA4 | linkedin | 77.6% | 2026-04-11 14:03 | LI-4398851818_Barclays_AutomationTestEngineerBA4_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/automation-test-engineer-ba4-at-barclays-4398851818) |
+| 28 | LI-4371178073 | eInfochips (An Arrow Company) | DFT Engineer | linkedin | 72.5% | 2026-04-11 14:03 | LI-4371178073_eInfochipsAnArrowCompany_DFTEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/dft-engineer-at-einfochips-an-arrow-company-4371178073) |
+| 29 | LI-4387766579 | Bajaj Finserv | Software Engineer | linkedin | 76.4% | 2026-04-11 14:03 | LI-4387766579_BajajFinserv_SoftwareEngineer_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/software-engineer-at-bajaj-finserv-4387766579) |
+| 30 | LI-4394788543 | Neev | BIM Engineer- Mechanical & Plumbing IV | linkedin | 93.3% | 2026-04-11 14:03 | LI-4394788543_Neev_BIMEngineerMechanicalPlumbingIV_2026-04-11.pdf | [Link](https://in.linkedin.com/jobs/view/bim-engineer-mechanical-plumbing-iv-at-neev-4394788543) |
 
 ## Skipped Jobs
 
@@ -212,6 +220,7 @@
 | 171 | LI-4373817865 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
 | 172 | LI-4383726398 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
 | 173 | LI-4383714912 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
+| 174 | LI-4383545446 | Siemens Energy | Supplier Quality Engineer | linkedin | 0.0% | Skipped - Already Processed (Duplicate Company+Title match) |
 
 ---
 
@@ -221,18 +230,18 @@ Most commonly requested skills you're missing:
 
 | Skill | Times Requested |
 |-------|----------------|
-| go | 33 |
-| excel | 26 |
-| azure | 18 |
-| python | 17 |
-| aws | 16 |
-| devops | 16 |
-| gcp | 11 |
-| security | 11 |
-| cypress | 8 |
-| github actions | 8 |
-| docker | 8 |
-| scrum | 7 |
-| oop | 7 |
-| cucumber | 6 |
-| salesforce | 6 |
+| go | 46 |
+| excel | 37 |
+| azure | 25 |
+| python | 24 |
+| aws | 23 |
+| devops | 22 |
+| gcp | 16 |
+| security | 15 |
+| docker | 12 |
+| cypress | 11 |
+| github actions | 11 |
+| scrum | 10 |
+| oop | 9 |
+| kubernetes | 9 |
+| cucumber | 8 |
