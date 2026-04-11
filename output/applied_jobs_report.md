@@ -1,10 +1,10 @@
 # Job Application Tracker Report
 
-**Total jobs processed:** 99  
+**Total jobs processed:** 124  
 **Applied:** 13  
-**Skipped:** 86  
+**Skipped:** 111  
 **Errors:** 0  
-**Last updated:** 2026-04-11 12:37:42
+**Last updated:** 2026-04-11 12:51:53
 
 ---
 
@@ -116,6 +116,31 @@
 | 84 | LI-4383726398 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate Company+Title match) |
 | 85 | LI-4383714912 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate Company+Title match) |
 | 86 | LI-4395972145 | Globex Digital | Platform Validation Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 87 | LI-4397835671 | StarApps Studio | QA Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 88 | LI-4393561606 | Tata Consultancy Services | Test Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 89 | LI-4386856290 | Siemens Energy | Quality Assurance Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 90 | LI-4397770375 | OUTSCALE | Operational QA Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 91 | LI-4079934536 | Williams-Sonoma, Inc. | Automation Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 92 | LI-4396756712 | Barclays | Test Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 93 | LI-4384036787 | EPAM Systems | Software Engineer – Salesforce Testing | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 94 | LI-4398851818 | Barclays | Automation Test Engineer - BA4 | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 95 | LI-4371178073 | eInfochips (An Arrow Company) | DFT Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 96 | LI-4386324059 | Tarana Wireless | Cloud QA Automation Engineer (Python) | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 97 | LI-4387766579 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 98 | LI-4398232186 | EPAM Systems | UI Path Developer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 99 | LI-4397162305 | Barclays | Software Development Engineer in Test | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 100 | LI-4400367992 | Geta AI Labs Private Limited | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 101 | LI-4382566681 | EPAM Systems | Data Quality Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 102 | LI-4383478991 | SAS | Sr Associate SDET | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 103 | LI-4394788543 | Neev | BIM Engineer- Mechanical & Plumbing IV | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 104 | LI-4383544448 | Siemens Energy | Supplier Quality Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 105 | LI-4383545446 | Siemens Energy | Supplier Quality Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate Company+Title match) |
+| 106 | LI-4387973920 | Siemens Energy | Supplier Quality Engineer, Piping | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 107 | LI-4398867008 | Barclays | Salesforce Test Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
+| 108 | LI-4373817865 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate Company+Title match) |
+| 109 | LI-4383726398 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate Company+Title match) |
+| 110 | LI-4383714912 | Bajaj Finserv | Software Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate Company+Title match) |
+| 111 | LI-4395972145 | Globex Digital | Platform Validation Engineer | linkedin | 0.0% | Skipped – Already Applied (Duplicate UID (same platform+company+title+url)) |
 
 ---
 
