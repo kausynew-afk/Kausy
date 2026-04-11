@@ -1,7 +1,6 @@
 # ============================================================
 # Job Application Agent - Configuration
 # ============================================================
-# Edit this file with YOUR details before running the agent.
 
 profile:
   job_title: "Software Test Engineer"
@@ -45,5 +44,5 @@ logging:
 
 automation:
   schedule_cron: "0 8 * * *"         # daily at 8 AM UTC
-  notify_on_completion: false
-  email_recipient: ""
+  notify_on_completion: true
+  email_recipient: "kausynew@gmail.com"

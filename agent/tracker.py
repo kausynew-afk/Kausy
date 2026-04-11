@@ -1,4 +1,8 @@
-"""Applied Jobs Tracker — persistent record of all processed jobs."""
+"""Applied Jobs Tracker — persistent record of all processed jobs.
+
+Tracks: Job Code, Company, Position, Platform, Action (Applied/Skipped),
+Reason, Resume File Name, ATS Score, Date, URL, Skill Gaps.
+"""
 
 from __future__ import annotations
 
@@ -14,12 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class JobTracker:
-    """Maintains a master JSON file of all jobs processed across runs.
-
-    File: data/logs/tracked_applications.json
-    Each entry contains: company, position, platform, location, url,
-    ats_score, status, applied_date, resume_path, and skill gaps.
-    """
+    """Maintains a master JSON file of all jobs processed across runs."""
 
     def __init__(self, config: dict[str, Any]) -> None:
         log_dir = Path(config.get("logging", {}).get("log_directory", "data/logs"))
@@ -43,10 +42,12 @@ class JobTracker:
         ats: ATSResult,
         status: str,
         resume_path: str = "",
+        resume_filename: str = "",
+        action: str = "",
         notes: str = "",
     ) -> None:
-        """Add a job to the tracker."""
         entry = {
+            "job_code": job.job_code or "NA",
             "company": job.company,
             "position": job.title,
             "platform": job.platform,
@@ -55,7 +56,10 @@ class JobTracker:
             "salary": job.salary or "Not disclosed",
             "ats_score": ats.overall_score,
             "status": status,
+            "action": action or ("Applied" if status == "logged" else "Skipped"),
+            "reason": notes if status != "logged" else "",
             "applied_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "resume_file": resume_filename,
             "resume_path": resume_path,
             "matched_skills": ats.technical_matches,
             "missing_skills": ats.technical_missing,
@@ -67,9 +71,64 @@ class JobTracker:
         self._persist()
 
         logger.info(
-            "Tracked: %s @ %s — %s (ATS %.1f%%)",
-            job.title, job.company, status, ats.overall_score,
+            "Tracked: %s @ %s — %s (ATS %.1f%%) — Resume: %s",
+            job.title, job.company, entry["action"],
+            ats.overall_score, resume_filename or "N/A",
         )
+
+    def track_skip(self, job: JobListing, reason: str) -> None:
+        """Log a skipped job (duplicate / empty JD) without ATS analysis."""
+        entry = {
+            "job_code": job.job_code or "NA",
+            "company": job.company,
+            "position": job.title,
+            "platform": job.platform,
+            "location": job.location,
+            "url": job.url,
+            "salary": job.salary or "Not disclosed",
+            "ats_score": 0,
+            "status": "skipped",
+            "action": "Skipped",
+            "reason": reason,
+            "applied_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "resume_file": "",
+            "resume_path": "",
+            "matched_skills": [],
+            "missing_skills": [],
+            "matched_soft_skills": [],
+            "matched_certs": [],
+            "notes": reason,
+        }
+        self._records.append(entry)
+        self._persist()
+        logger.info("Tracked SKIP: %s @ %s — %s", job.title, job.company, reason)
+
+    def track_error(self, job: JobListing, error_msg: str) -> None:
+        """Log a failed job processing attempt."""
+        entry = {
+            "job_code": job.job_code or "NA",
+            "company": job.company,
+            "position": job.title,
+            "platform": job.platform,
+            "location": job.location,
+            "url": job.url,
+            "salary": job.salary or "Not disclosed",
+            "ats_score": 0,
+            "status": "error",
+            "action": "Error",
+            "reason": error_msg[:200],
+            "applied_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "resume_file": "",
+            "resume_path": "",
+            "matched_skills": [],
+            "missing_skills": [],
+            "matched_soft_skills": [],
+            "matched_certs": [],
+            "notes": error_msg[:200],
+        }
+        self._records.append(entry)
+        self._persist()
+        logger.info("Tracked ERROR: %s @ %s — %s", job.title, job.company, error_msg[:100])
 
     def _persist(self) -> None:
         self._path.write_text(
@@ -78,44 +137,55 @@ class JobTracker:
         )
 
     def write_tracker_report(self, output_dir: str = "output") -> Path:
-        """Generate a human-readable Markdown report of all tracked jobs."""
+        """Generate a Markdown report of all tracked jobs."""
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
         report_path = out / "applied_jobs_report.md"
 
-        logged = [r for r in self._records if r["status"] == "logged"]
-        skipped = [r for r in self._records if r["status"] == "skipped"]
+        applied = [r for r in self._records if r["action"] == "Applied"]
+        skipped = [r for r in self._records if r["action"] == "Skipped"]
+        errors = [r for r in self._records if r["action"] == "Error"]
 
         lines = [
-            "# Applied Jobs Tracker\n",
-            f"**Total jobs tracked:** {len(self._records)}  ",
-            f"**Logged (matched):** {len(logged)}  ",
-            f"**Skipped (low score):** {len(skipped)}  ",
+            "# Job Application Tracker Report\n",
+            f"**Total jobs processed:** {len(self._records)}  ",
+            f"**Applied:** {len(applied)}  ",
+            f"**Skipped:** {len(skipped)}  ",
+            f"**Errors:** {len(errors)}  ",
             f"**Last updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n",
             "---\n",
         ]
 
-        if logged:
-            lines.append("## Matched Jobs (Logged)\n")
-            lines.append("| # | Company | Position | Platform | Location | ATS Score | Date | URL |")
-            lines.append("|---|---------|----------|----------|----------|-----------|------|-----|")
-            for i, r in enumerate(logged, 1):
-                url_short = r['url'][:50] + "..." if len(r['url']) > 50 else r['url']
+        if applied:
+            lines.append("## Applied Jobs\n")
+            lines.append("| # | Job Code | Company | Position | Platform | ATS Score | Date | Resume File | URL |")
+            lines.append("|---|----------|---------|----------|----------|-----------|------|-------------|-----|")
+            for i, r in enumerate(applied, 1):
                 lines.append(
-                    f"| {i} | {r['company']} | {r['position']} | {r['platform']} | "
-                    f"{r['location']} | {r['ats_score']:.1f}% | {r['applied_date']} | "
-                    f"[Link]({r['url']}) |"
+                    f"| {i} | {r['job_code']} | {r['company']} | {r['position']} | "
+                    f"{r['platform']} | {r['ats_score']:.1f}% | {r['applied_date']} | "
+                    f"{r['resume_file']} | [Link]({r['url']}) |"
                 )
             lines.append("")
 
         if skipped:
-            lines.append("## Skipped Jobs (Low ATS Score)\n")
-            lines.append("| # | Company | Position | Platform | ATS Score | Date | Reason |")
-            lines.append("|---|---------|----------|----------|-----------|------|--------|")
+            lines.append("## Skipped Jobs\n")
+            lines.append("| # | Job Code | Company | Position | Platform | ATS Score | Reason |")
+            lines.append("|---|----------|---------|----------|----------|-----------|--------|")
             for i, r in enumerate(skipped, 1):
                 lines.append(
-                    f"| {i} | {r['company']} | {r['position']} | {r['platform']} | "
-                    f"{r['ats_score']:.1f}% | {r['applied_date']} | {r['notes']} |"
+                    f"| {i} | {r['job_code']} | {r['company']} | {r['position']} | "
+                    f"{r['platform']} | {r['ats_score']:.1f}% | {r['reason'][:80]} |"
+                )
+            lines.append("")
+
+        if errors:
+            lines.append("## Errors\n")
+            lines.append("| # | Company | Position | Error |")
+            lines.append("|---|---------|----------|-------|")
+            for i, r in enumerate(errors, 1):
+                lines.append(
+                    f"| {i} | {r['company']} | {r['position']} | {r['reason'][:80]} |"
                 )
             lines.append("")
 
@@ -141,10 +211,14 @@ class JobTracker:
         logger.info("Tracker report written to %s", report_path)
         return report_path
 
+    def get_current_run_records(self, run_start: str) -> list[dict]:
+        """Get records from the current run only (for email report)."""
+        return [r for r in self._records if r["applied_date"] >= run_start]
+
     @property
     def total_tracked(self) -> int:
         return len(self._records)
 
     @property
     def total_logged(self) -> int:
-        return sum(1 for r in self._records if r["status"] == "logged")
+        return sum(1 for r in self._records if r["action"] == "Applied")

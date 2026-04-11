@@ -191,6 +191,10 @@ class NaukriScraper(BaseScraper):
         if tags:
             description += f"\n\nKey Skills: {tags}"
 
+        job_code = job.get("jobId", "")
+        if job_code:
+            job_code = f"NK-{job_code}"
+
         return JobListing(
             title=title,
             company=company,
@@ -200,6 +204,7 @@ class NaukriScraper(BaseScraper):
             platform="naukri",
             salary=salary or None,
             experience_level=experience or None,
+            job_code=job_code or None,
         )
 
     async def _scrape_via_browser(self, page: Page, max_results: int) -> list[JobListing]:
@@ -275,6 +280,9 @@ class NaukriScraper(BaseScraper):
         tags_el = await card.query_selector("ul.tags-gt, div.tags-gt")
         tags = (await tags_el.inner_text()).strip() if tags_el else ""
 
+        job_id = await card.get_attribute("data-job-id")
+        job_code = f"NK-{job_id}" if job_id else None
+
         return JobListing(
             title=title,
             company=company,
@@ -284,4 +292,5 @@ class NaukriScraper(BaseScraper):
             platform="naukri",
             salary=salary,
             experience_level=experience,
+            job_code=job_code,
         )

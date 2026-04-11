@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import urllib.parse
 from typing import Any
 
@@ -140,6 +141,11 @@ class IndeedScraper(BaseScraper):
 
         description = await self._fetch_description(page, href)
 
+        job_code = None
+        match = re.search(r"jk=([a-f0-9]+)", href_raw)
+        if match:
+            job_code = f"IND-{match.group(1)}"
+
         return JobListing(
             title=title,
             company=company,
@@ -147,6 +153,7 @@ class IndeedScraper(BaseScraper):
             description=description,
             url=href.split("&")[0],
             platform="indeed",
+            job_code=job_code,
         )
 
     async def _fetch_description(self, page: Page, url: str) -> str:

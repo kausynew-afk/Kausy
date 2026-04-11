@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 from agent.config_loader import load_config
+from agent.email_report import EmailReporter
 from agent.orchestrator import Orchestrator
 
 
@@ -67,7 +68,15 @@ Examples:
         logger.info("DRY RUN mode — no applications will be logged")
 
     orchestrator = Orchestrator(config)
-    asyncio.run(orchestrator.run())
+    run_result = asyncio.run(orchestrator.run())
+
+    # Send email report if configured
+    emailer = EmailReporter(config)
+    emailer.send_report(
+        records=run_result["records"],
+        run_id=run_result["run_id"],
+        stats=run_result,
+    )
 
 
 if __name__ == "__main__":
